@@ -3,25 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Data & Database files
-data/app.db
-data/app.db-wal
-data/app.db-shm
-data/*.csv
-data/*.xlsx
-data/*.xls
-data/*.json
-data/*.png
-data/*.jpg
-data/*.jpeg
-debug_db.csv
-debug_tax.csv
-
-# Output & Uploads
+# Data, Database & Template files
+data/
 output/
 uploads/
+template.xlsx
+*.xlsx
+*.xls
+*.csv
 *.pdf
 *.log
+debug_db.csv
+debug_tax.csv
 
 # Environment & Config
 .env
