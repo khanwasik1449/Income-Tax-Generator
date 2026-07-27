@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Database files
+data/app.db
+data/app.db-wal
+data/app.db-shm
+data/*.csv
+data/*.xlsx
+data/*.xls
+data/*.json
+data/*.png
+data/*.jpg
+data/*.jpeg
+debug_db.csv
+debug_tax.csv
+
+# Output & Uploads
+output/
+uploads/
+*.pdf
+*.log
+
+# Environment & Config
+.env
+.venv/
+venv/
+ENV/
+env/
+.idea/
+.vscode/
+.DS_Store

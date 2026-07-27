@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax Statement Portal - Income Tax Statement &amp; CRM System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --success: #10b981;
+  --success-hover: #059669;
+  --success-light: #ecfdf5;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --dark: #0f172a;
+  --dark-surface: #1e293b;
+  --dark-border: #334155;
+  --light-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', -apple-system, sans-serif; }
+
+body { background: var(--light-bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Top Header */
+.header {
+  background: var(--dark-surface);
+  color: #fff;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--dark-border);
+  box-shadow: var(--shadow);
+}
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-icon {
+  width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+}
+.header-title h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.header-title p { font-size: 12px; color: #94a3b8; }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Dashboard Analytics Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 20px 28px 0 28px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.stat-info .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-info .stat-value { font-size: 20px; font-weight: 800; color: var(--text-main); margin: 6px 0 4px 0; }
+.stat-info .stat-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.stat-icon {
+  width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.icon-blue { background: #eff6ff; color: #2563eb; }
+.icon-green { background: #ecfdf5; color: #10b981; }
+.icon-amber { background: #fffbeb; color: #f59e0b; }
+.icon-purple { background: #f5f3ff; color: #8b5cf6; }
+
+/* Main Layout */
+.layout { display: flex; flex: 1; padding: 20px 28px; gap: 24px; }
+
+/* Sidebar */
+.sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+.sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.sidebar-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 14px; }
+
+.upload-zone {
+  border: 2px dashed #cbd5e1;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--primary); background: var(--primary-light); }
+.upload-zone.loaded { border-color: var(--success); background: var(--success-light); }
+.upload-zone h4 { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+.upload-zone p { font-size: 11px; color: var(--text-muted); }
+.upload-zone .file-badge { font-size: 10px; font-weight: 700; color: var(--primary); background: #dbeafe; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-top: 6px; }
+.upload-zone.loaded .file-badge { color: var(--success); background: #d1fae5; }
+.upload-zone input { display: none; }
+
+.replace-btn {
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: #f97316;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: none;
+}
+.replace-btn:hover { background: #ea580c; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.2s ease; text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-success { background: var(--success); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
+.btn-success:hover { background: var(--success-hover); transform: translateY(-1px); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+.btn-outline:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+
+/* Main Content Area */
+.main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+.toolbar {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.search-input-wrap { position: relative; flex: 1; min-width: 260px; }
+.search-input-wrap input {
+  width: 100%; padding: 9px 14px 9px 36px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s;
+  background: #f8fafc;
+}
+.search-input-wrap input:focus { border-color: var(--primary); background: #fff; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+
+.filter-pills { display: flex; gap: 6px; }
+.pill {
+  padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  background: #f1f5f9; color: var(--text-muted); cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease;
+}
+.pill:hover { background: #e2e8f0; color: var(--text-main); }
+.pill.active { background: var(--primary-light); color: var(--primary); border-color: #bfdbfe; }
+
+/* Table */
+.table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  flex: 1;
+}
+.table-wrapper { overflow-x: auto; max-height: calc(100vh - 300px); }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th {
+  background: #f8fafc; color: var(--text-muted); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.6px; padding: 12px 16px;
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  cursor: pointer; user-select: none;
+}
+th:hover { color: var(--primary); background: #f1f5f9; }
+td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
+tr:hover td { background: #f8fafc; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-male { background: #eff6ff; color: #1d4ed8; }
+.badge-female { background: #fdf2f8; color: #be185d; }
+.badge-tax { background: #ecfdf5; color: #047857; }
+.badge-none { background: #f1f5f9; color: #94a3b8; }
+
+/* Modal & Preview */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px); z-index: 200; justify-content: center; align-items: center; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow-lg);
+  width: 900px; max-width: 95vw; max-height: 92vh; display: flex; flex-direction: column;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.modal-header {
+  padding: 16px 24px; background: var(--dark-surface); color: #fff;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.modal-header h3 { font-size: 16px; font-weight: 700; }
+.modal-close { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
+.modal-close:hover { color: #fff; }
+
+.modal-controls {
+  padding: 14px 24px; background: #f8fafc; border-bottom: 1px solid var(--border);
+  display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+.control-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+.control-group input {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; outline: none;
+}
+.control-group input:focus { border-color: var(--primary); }
+
+.preview-body { flex: 1; min-height: 480px; background: #525659; position: relative; }
+.preview-body iframe { width: 100%; height: 100%; border: none; min-height: 480px; }
+
+/* Detail Drawer */
+.drawer {
+  position: fixed; top: 0; right: -560px; width: 540px; height: 100vh;
+  background: #fff; box-shadow: var(--shadow-lg); transition: right 0.3s ease;
+  z-index: 150; display: flex; flex-direction: column; border-left: 1px solid var(--border);
+}
+.drawer.open { right: 0; }
+.drawer-header {
+  background: var(--dark-surface); color: #fff; padding: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.drawer-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.6px; padding-bottom: 6px; border-bottom: 2px solid var(--primary-light); }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-item { font-size: 13px; }
+.detail-item .lbl { color: var(--text-muted); font-size: 11px; font-weight: 600; display: block; margin-bottom: 2px; }
+.detail-item .val { font-weight: 600; color: var(--text-main); }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.6; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: var(--dark-surface); color: #fff;
+  padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg); z-index: 300; display: none; border-left: 4px solid var(--primary);
+  animation: slideUp 0.25s ease;
+}
+.toast.show { display: block; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.manual-tab {
+  background: transparent; border: none; color: #94a3b8; padding: 12px 16px;
+  font-size: 12px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.15s ease; white-space: nowrap;
+}
+.manual-tab:hover { color: #fff; }
+.manual-tab.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">%</div>
+    <div class="header-title">
+      <h1>Tax Statement Portal</h1>
+      <p>Income Tax Statement &amp; CRM System</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div id="headerFyTag" style="display:flex; align-items:center; gap:6px; background:#0f172a; border:2px solid #38bdf8; color:#fbbf24; font-weight:800; font-size:11px; padding:6px 12px; border-radius:10px; box-shadow:0 0 10px rgba(56,189,248,0.3);" title="Current active Fiscal Year filter across the entire portal">
+      <span>📅</span> ACTIVE: <span id="headerFyText" style="color:#38bdf8; font-size:12px; font-weight:800;">FY 2025-2026</span>
+    </div>
+    <div id="userProfileBadge" style="display:flex; align-items:center; gap:10px; background:#334155; padding:6px 12px; border-radius:10px; font-size:12px; cursor:pointer;" title="Click to manage your account & password settings" onclick="openProfileModal()">
+      <div style="text-align:right;">
+        <div id="userName" style="font-weight:700; color:#fff;">Department User</div>
+        <span id="userDept" style="font-size:10px; color:#38bdf8; font-weight:600;">Department</span>
+      </div>
+      <a href="/logout" onclick="event.stopPropagation()" class="btn btn-outline btn-sm" style="color:#fca5a5; border-color:rgba(239,68,68,0.4); padding:4px 8px; text-decoration:none;">Logout</a>
+    </div>
+    <button class="btn btn-outline" id="btnDatasetsHub" style="color:#38bdf8; border-color:rgba(56,189,248,0.5);" onclick="openDatasetsModal()">
+      <span>📂</span> Datasets Hub
+    </button>
+    <button class="btn btn-outline" id="btnAuditInspector" style="color:#f59e0b; border-color:rgba(245,158,11,0.5);" onclick="openAuditModal()">
+      <span>🔍</span> Data Audit &amp; Inspector <span id="auditBadge" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:4px; display:none;">0</span>
+    </button>
+    <button class="btn btn-outline" id="btnDownloadSample" style="color:#fff; border-color:#475569;">
+      <span>📥</span> Sample Files
+    </button>
+    <button class="btn btn-success" id="btnExportExcel" style="display:none;">
+      <span>📊</span> Export Excel Summary
+    </button>
+    <button class="btn btn-outline" id="btnManageUsers" style="display:none; color:#f59e0b; border-color:rgba(245,158,11,0.5);" onclick="openUserModal()">
+      <span>👑</span> Manage Users &amp; Scopes
+    </button>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-info">
+      <div class="stat-label">Total Employees</div>
+      <div class="stat-value" id="kpiTotalEmp">0</div>
+      <div class="stat-sub" id="kpiGenderSub">0 Male / 0 Female</div>
+    </div>
+    <div class="stat-icon icon-blue">👥</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-info">
+      <div class="stat-label">Total Net Payroll</div>
+      <div class="stat-value" id="kpiTotalNet">BDT 0</div>
+      <div class="stat-sub" id="kpiGrossSub">FY 2024-2025 Gross</div>
+    </div>
+    <div class="stat-icon icon-purple">💵</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-info">
+      <div class="stat-label">Total Tax Claimed</div>
+      <div class="stat-value" id="kpiTaxClaimed">BDT 0</div>
+      <div class="stat-sub" id="kpiChallanSub">0 Challan Records</div>
+    </div>
+    <div class="stat-icon icon-green">🏛️</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-info">
+      <div class="stat-label">Tax Compliance</div>
+      <div class="stat-value" id="kpiCompliance">0%</div>
+      <div class="stat-sub" id="kpiTaxEmpSub">0 with Tax records</div>
+    </div>
+    <div class="stat-icon icon-amber">📜</div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">Data Upload Hub</div>
+      
+      <div class="upload-zone" id="dbUpload">
+        <h4>1. Database (Salary)</h4>
+        <p>CSV or Excel (.xlsx)</p>
+        <span class="file-badge" id="dbCount">Not Loaded</span>
+        <div id="dbDate" style="font-size:10px; color:#64748b; margin-top:4px;"></div>
+        <div style="display:flex; gap:6px; margin-top:8px; justify-content:center;">
+          <button class="replace-btn" id="dbReplace">Replace File</button>
+          <button class="replace-btn" id="dbRemove" style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="removeUploadedFile('database', event)">🗑️ Remove</button>
+        </div>
+        <input type="file" id="dbFile" accept=".csv, .xlsx, .xls">
+      </div>
+
+      <div class="upload-zone" id="taxUpload">
+        <h4>2. Tax Challan Info</h4>
+        <p>CSV or Excel (.xlsx)</p>
+        <span class="file-badge" id="taxCount">Not Loaded</span>
+        <div id="taxDate" style="font-size:10px; color:#64748b; margin-top:4px;"></div>
+        <div style="display:flex; gap:6px; margin-top:8px; justify-content:center;">
+          <button class="replace-btn" id="taxReplace">Replace File</button>
+          <button class="replace-btn" id="taxRemove" style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="removeUploadedFile('tax', event)">🗑️ Remove</button>
+        </div>
+        <input type="file" id="taxFile" accept=".csv, .xlsx, .xls">
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title">Export Shortcuts</div>
+      <button class="btn btn-outline" style="width:100%; justify-content:flex-start;" id="sidebarExportExcel" disabled>
+        <span>📈</span> Download Summary Excel
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="toolbar" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div class="fy-select-wrap" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border:2px solid #38bdf8; padding:6px 14px; border-radius:10px; box-shadow:0 0 14px rgba(56,189,248,0.3); transition:all 0.2s ease;" title="Active Fiscal Year selector - Determines all statistics, tables, audit report, and PDF certificates">
+        <span style="color:#fbbf24; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <span>📅</span> ACTIVE FISCAL YEAR:
+        </span>
+        <select id="fySelect" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; font-weight:800; font-size:13px; padding:6px 12px; cursor:pointer; outline:none; box-shadow:0 2px 6px rgba(0,0,0,0.3);" onchange="changeFiscalYear(this.value)">
+          <option value="" style="background:#0f172a; color:#fff;">Loading Years...</option>
+        </select>
+      </div>
+      <div class="search-input-wrap" style="flex:1;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by PIN, Gender, or TIN...">
+      </div>
+      <div class="filter-pills">
+        <div class="pill active" onclick="setFilter('all', this)">All Employees</div>
+        <div class="pill" onclick="setFilter('taxed', this)">Tax Deducted</div>
+        <div class="pill" onclick="setFilter('notax', this)">No Tax Challans</div>
+      </div>
+    </div>
+
+    <!-- Active Fiscal Year Directory Header Bar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; margin-top:18px; padding:0 4px;">
+      <div style="font-size:15px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:10px;">
+        <span>👥 Employee Directory &amp; Tax Certificates</span>
+        <span id="activeFyBadge" style="background:#0f172a; color:#fbbf24; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; border:1px solid #38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.2);">📅 FY 2025-2026</span>
+      </div>
+      <div style="font-size:11px; color:#64748b; font-weight:600;">Displaying active fiscal year records</div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrapper" id="tableContainer">
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <h3>No Data Loaded Yet</h3>
+          <p>Upload your Employee Salary Database (CSV/Excel) from the left sidebar to get started.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer style="margin: 30px 24px 16px; padding: 20px 0; text-align: center; border-top: 1px solid var(--border); color: #64748b; font-size: 12px;">
+  <p style="font-weight: 600; color: #475569;">BRAC Institute of Educational Development (BRAC IED)</p>
+  <p style="font-weight: 600; color: #38bdf8; font-size: 12px; margin-top: 4px;">Developer: Wasik Ahmed Khan</p>
+</footer>
+
+<!-- PDF In-Browser Live Preview Modal -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 style="display:flex; align-items:center; gap:8px;">
+        <span>📄 Tax Certificate Live Preview</span>
+        <span id="pdfFyBadge" style="font-size:11px; background:#1e293b; color:#fbbf24; padding:3px 10px; border-radius:10px; border:1px solid #38bdf8; font-weight:800;">FY 2025-2026</span>
+      </h3>
+      <button class="modal-close" onclick="closePdfModal()">&times;</button>
+    </div>
+    <div class="modal-controls" style="background:#f8fafc; border-bottom:1px solid var(--border); padding:12px 20px; display:grid; grid-template-columns: 1.2fr 1fr 1fr auto auto; gap:12px; align-items:end;">
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Employee Name</label>
+        <input type="text" id="pdfName" placeholder="Enter Full Name" oninput="debounceRefreshPreview()" style="padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; outline:none; background:#fff; color:#0f172a;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Designation</label>
+        <input type="text" id="pdfDesignation" placeholder="Enter Designation" oninput="debounceRefreshPreview()" style="padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; outline:none; background:#fff; color:#0f172a;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">TIN Number</label>
+        <input type="text" id="pdfTin" placeholder="Enter 12-Digit TIN" oninput="debounceRefreshPreview()" style="padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; outline:none; background:#fff; color:#0f172a;">
+      </div>
+      
+      <!-- Letterhead Control Pill -->
+      <div style="display:flex; align-items:center; gap:8px; background:#0f172a; padding:6px 12px; border-radius:8px; border:1px solid #334155; height:38px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+        <input type="checkbox" id="pdfUseLetterhead" style="width:16px; height:16px; cursor:pointer; accent-color:#38bdf8;" onchange="debounceRefreshPreview()">
+        <label for="pdfUseLetterhead" style="cursor:pointer; font-size:12px; font-weight:700; color:#38bdf8; margin:0; white-space:nowrap;">📜 Letterhead BG</label>
+        <button class="btn btn-outline btn-sm" style="font-size:11px; padding:3px 8px; color:#f59e0b; border-color:rgba(245,158,11,0.5); font-weight:600;" onclick="triggerLetterheadUpload()" title="Upload custom letterhead image (.png / .jpg)">📤 Upload</button>
+      </div>
+
+      <div>
+        <button class="btn btn-primary" style="height:38px; display:inline-flex; align-items:center; gap:6px; font-weight:700;" onclick="downloadCurrentPdf()">
+          <span>⬇️</span> Download PDF
+        </button>
+      </div>
+    </div>
+    <div class="preview-body">
+      <iframe id="pdfFrame" src="about:blank"></iframe>
+    </div>
+  </div>
+</div>
+<input type="file" id="letterheadFileInput" accept="image/png, image/jpeg" style="display:none;" onchange="uploadLetterheadImage(this)">
+
+<!-- Missing TIN Popup Prompt Modal -->
+<div class="modal-overlay" id="missingTinModal" style="z-index:250;">
+  <div class="modal-box" style="width:480px; max-width:92vw;">
+    <div class="modal-header" style="background:#0f172a; color:#fff; border-bottom:1px solid #334155;">
+      <h3 style="font-size:15px; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:8px;">
+        <span>⚠️</span> Missing TIN Number
+      </h3>
+      <button class="modal-close" style="color:#94a3b8;" onclick="closeMissingTinModal()">&times;</button>
+    </div>
+    <div style="padding:20px; background:#0f172a; color:#e2e8f0;">
+      <div style="font-size:12px; color:#cbd5e1; margin-bottom:14px;" id="missingTinPromptText">
+        Employee PIN <strong>10001</strong> does not have a Tax Identification Number (TIN). Please enter a valid 12-digit TIN below before generating the certificate.
+      </div>
+      <div class="control-group" style="margin-bottom:16px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">12-Digit TIN Number</label>
+        <input type="text" id="promptTinInput" placeholder="e.g. 123456789012" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px 12px; border-radius:8px; width:100%; font-size:13px; font-weight:700; outline:none;">
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-outline" style="color:#94a3b8; border-color:#334155;" onclick="skipAndGeneratePdf()">Skip &amp; Generate PDF</button>
+        <button class="btn btn-success" onclick="saveTinAndGeneratePdf()">💾 Save TIN &amp; Generate PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Audit & Mismatch Inspector Modal -->
+<div class="modal-overlay" id="auditModal">
+  <div class="modal-box" style="max-width:900px; width:92%;">
+    <div class="modal-header" style="border-bottom:1px solid #334155; padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:22px;">🔍</span>
+        <div>
+          <h3 style="margin:0; font-size:16px; color:#f8fafc;">Data Audit &amp; Mismatch Inspector</h3>
+          <p style="margin:2px 0 0; font-size:11px; color:#94a3b8;">Automated data integrity checks, missing TIN detection, and PIN mismatch inspector</p>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeAuditModal()">&times;</button>
+    </div>
+
+    <div style="padding:16px;">
+      <!-- Summary KPI Cards -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom: 16px;">
+        <div style="background:#1e293b; padding:12px 14px; border-radius:10px; border:1px solid #334155;">
+          <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Total Issues</div>
+          <div id="auditTotalIssues" style="font-size:22px; font-weight:700; color:#f87171; margin-top:2px;">0</div>
+        </div>
+        <div style="background:#1e293b; padding:12px 14px; border-radius:10px; border:1px solid #334155;">
+          <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Unmatched Tax PINs</div>
+          <div id="auditUnmatchedTax" style="font-size:22px; font-weight:700; color:#ef4444; margin-top:2px;">0</div>
+        </div>
+        <div style="background:#1e293b; padding:12px 14px; border-radius:10px; border:1px solid #334155;">
+          <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; font-weight:700;">No Tax Records</div>
+          <div id="auditNoTax" style="font-size:22px; font-weight:700; color:#38bdf8; margin-top:2px;">0</div>
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;" id="auditFilterBar">
+        <button class="pill active" style="font-size:11px; padding:4px 10px;" onclick="filterAuditIssues('all', this)">All Issues</button>
+        <button class="pill" style="font-size:11px; padding:4px 10px;" onclick="filterAuditIssues('tax_without_db', this)">🚨 Unmatched PINs</button>
+        <button class="pill" style="font-size:11px; padding:4px 10px;" onclick="filterAuditIssues('db_without_tax', this)">ℹ️ No Tax Records</button>
+        <button class="pill" style="font-size:11px; padding:4px 10px;" onclick="filterAuditIssues('salary_anomaly', this)">⚠️ Salary Anomalies</button>
+      </div>
+
+      <!-- Issues Table Container -->
+      <div style="max-height:380px; overflow-y:auto; border:1px solid #334155; border-radius:8px; background:#0f172a;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+          <thead>
+            <tr style="background:#1e293b; color:#94a3b8; border-bottom:1px solid #334155; position:sticky; top:0;">
+              <th style="padding:10px 12px; font-weight:700;">Severity</th>
+              <th style="padding:10px 12px; font-weight:700;">PIN</th>
+              <th style="padding:10px 12px; font-weight:700;">Name</th>
+              <th style="padding:10px 12px; font-weight:700;">Department</th>
+              <th style="padding:10px 12px; font-weight:700;">Issue Description</th>
+              <th style="padding:10px 12px; text-align:center; font-weight:700;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="auditTableBody">
+            <tr>
+              <td colspan="6" style="padding:24px; text-align:center; color:#94a3b8;">Loading audit report...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:16px; text-align:right;">
+        <button class="btn btn-outline" onclick="closeAuditModal()">Close Audit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Systemic Dataset Hub Modal -->
+<div class="modal-overlay" id="datasetsModal">
+  <div class="modal-box" style="width:840px;">
+    <div class="modal-header" style="background:#0f172a; color:#fff; border-bottom:1px solid #334155;">
+      <h3 style="font-size:16px; font-weight:700; color:#38bdf8;">📂 Systemic Dataset &amp; Upload Hub</h3>
+      <button class="modal-close" style="color:#94a3b8;" onclick="closeDatasetsModal()">&times;</button>
+    </div>
+    <div style="padding:20px; background:#0f172a; color:#e2e8f0; overflow-y:auto; max-height:80vh;">
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:#38bdf8; font-size:13px; margin-bottom:2px;">📊 Centralized Data Repository</div>
+          <div style="font-size:11px; color:#94a3b8;">Manage salary database and tax challans per fiscal year. Replace or delete datasets with full audit history.</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="color:#f87171; border-color:rgba(248,113,113,0.4);" onclick="clearAllDataSystemic()">
+          <span>🗑️</span> Reset / Clear All Datasets
+        </button>
+      </div>
+
+      <!-- Letterhead Upload Banner -->
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:#fbbf24; font-size:13px; margin-bottom:2px;">📜 Official Institution Letterhead Image</div>
+          <div style="font-size:11px; color:#94a3b8;">Upload your institution's letterhead image (.png or .jpg) to use as the background of PDF certificates.</div>
+        </div>
+        <button class="btn btn-outline btn-sm" style="color:#fbbf24; border-color:rgba(251,191,36,0.4);" onclick="triggerLetterheadUpload()">
+          <span>📤</span> Upload Letterhead Image
+        </button>
+      </div>
+
+      <!-- Fiscal Year Datasets Grid -->
+      <div id="datasetsGridContainer" style="display:flex; flex-direction:column; gap:16px;">
+        <div style="text-align:center; padding:30px; color:#94a3b8;">Loading dataset inventory...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin User & Access Scope Management Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-box" style="width:780px;">
+    <div class="modal-header">
+      <h3>👑 User &amp; Department Access Scope Management</h3>
+      <button class="modal-close" onclick="closeUserModal()">&times;</button>
+    </div>
+    <div style="padding:20px; overflow-y:auto; max-height:80vh;">
+      <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:20px;">
+        <h4 style="font-size:13px; font-weight:700; text-transform:uppercase; color:var(--primary); margin-bottom:12px;">+ Add New User Account &amp; Assign Access Scope</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="control-group">
+            <label>Username</label>
+            <input type="text" id="newUsername" placeholder="e.g. jdoe">
+          </div>
+          <div class="control-group">
+            <label>Password</label>
+            <input type="password" id="newPassword" placeholder="e.g. pass123">
+          </div>
+          <div class="control-group">
+            <label>Full Name</label>
+            <input type="text" id="newName" placeholder="e.g. John Doe">
+          </div>
+          <div class="control-group">
+            <label>Role</label>
+            <select id="newRole" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px;">
+              <option value="Department Manager">Department Manager</option>
+              <option value="Finance Manager (Full Access)">Finance Manager (Full Access)</option>
+              <option value="HR Manager (Full Access)">HR Manager (Full Access)</option>
+              <option value="Super Admin">Super Admin</option>
+            </select>
+          </div>
+          <div class="control-group" style="grid-column:span 2">
+            <label>Department Access Scope</label>
+            <select id="newDept" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px;">
+              <option value="All Departments">All Departments (Full Access)</option>
+              <option value="BRAC IED">BRAC IED</option>
+              <option value="BRAC University">BRAC University</option>
+              <option value="Accounts &amp; Finance">Accounts &amp; Finance</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Research &amp; Operations">Research &amp; Operations</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px; text-align:right;">
+          <button class="btn btn-primary" onclick="createUserAccount()">+ Create User &amp; Grant Scope</button>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:13px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px;">Active User Accounts &amp; Granted Scopes</h4>
+        <div id="usersTableWrap">
+          <p style="font-size:12px; color:var(--text-muted)">Loading user list...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Edit User Account Modal -->
+<div class="modal-overlay" id="editUserModal" style="z-index:230;">
+  <div class="modal-box" style="width:520px; max-width:92vw;">
+    <div class="modal-header" style="background:#0f172a; color:#fff; border-bottom:1px solid #334155;">
+      <h3 style="font-size:15px; font-weight:700; color:#f59e0b; display:flex; align-items:center; gap:8px;">
+        <span>✏️</span> Edit User Account &amp; Access Scope
+      </h3>
+      <button class="modal-close" style="color:#94a3b8;" onclick="closeEditUserModal()">&times;</button>
+    </div>
+    <div style="padding:20px; background:#0f172a; color:#e2e8f0;">
+      <input type="hidden" id="editTargetUsername">
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Username (Rename Account)</label>
+        <input type="text" id="editUsernameInput" placeholder="Username" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Full Name</label>
+        <input type="text" id="editNameInput" placeholder="Full Name" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Set New Password</label>
+        <input type="password" id="editPasswordInput" placeholder="Leave blank to keep unchanged" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Role</label>
+        <select id="editRoleSelect" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+          <option value="Department Manager">Department Manager</option>
+          <option value="Finance Manager (Full Access)">Finance Manager (Full Access)</option>
+          <option value="HR Manager (Full Access)">HR Manager (Full Access)</option>
+          <option value="Super Admin">Super Admin</option>
+        </select>
+      </div>
+      <div class="control-group" style="margin-bottom:16px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Department Access Scope</label>
+        <select id="editDeptSelect" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+          <option value="All Departments">All Departments (Full Access)</option>
+          <option value="BRAC IED">BRAC IED</option>
+          <option value="BRAC University">BRAC University</option>
+          <option value="Accounts &amp; Finance">Accounts &amp; Finance</option>
+          <option value="Human Resources">Human Resources</option>
+          <option value="Research &amp; Operations">Research &amp; Operations</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-outline" style="color:#94a3b8; border-color:#334155;" onclick="closeEditUserModal()">Cancel</button>
+        <button class="btn btn-warning" style="background:#f59e0b; color:#0f172a; font-weight:700;" onclick="saveAdminUserEdit()">💾 Save User Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- My Profile & Security Settings Modal -->
+<div class="modal-overlay" id="profileModal" style="z-index:230;">
+  <div class="modal-box" style="width:480px; max-width:92vw;">
+    <div class="modal-header" style="background:#0f172a; color:#fff; border-bottom:1px solid #334155;">
+      <h3 style="font-size:15px; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+        <span>👤</span> My Account &amp; Password Settings
+      </h3>
+      <button class="modal-close" style="color:#94a3b8;" onclick="closeProfileModal()">&times;</button>
+    </div>
+    <div style="padding:20px; background:#0f172a; color:#e2e8f0;">
+      <div style="font-size:12px; color:#cbd5e1; margin-bottom:14px;">
+        Update your account profile name, username, or change your password.
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Full Name</label>
+        <input type="text" id="profileNameInput" placeholder="Enter Full Name" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">Username</label>
+        <input type="text" id="profileUsernameInput" placeholder="Enter Username" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:12px;">
+        <label style="color:#94a3b8; font-size:11px; font-weight:700; text-transform:uppercase;">New Password (Optional)</label>
+        <input type="password" id="profileNewPasswordInput" placeholder="Leave blank to keep unchanged" style="background:#1e293b; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div class="control-group" style="margin-bottom:16px;">
+        <label style="color:#f59e0b; font-size:11px; font-weight:700; text-transform:uppercase;">Current Password (Required for changes)</label>
+        <input type="password" id="profileCurrentPasswordInput" placeholder="Enter current password" style="background:#1e293b; border:1px solid #f59e0b; color:#fff; padding:10px; border-radius:8px; width:100%; font-size:13px;">
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-outline" style="color:#94a3b8; border-color:#334155;" onclick="closeProfileModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveMyProfileChanges()">💾 Save Profile Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- System User Manual Modal -->
+<div class="modal-overlay" id="manualModal">
+  <div class="modal-box" style="width:860px; max-width:95vw; border-radius:16px; overflow:hidden;">
+    <div class="modal-header" style="background:#0f172a; color:#fff; border-bottom:1px solid #334155; padding:18px 24px;">
+      <div>
+        <h3 style="color:#38bdf8; margin:0; font-size:18px; font-weight:700;">📖 System User Manual &amp; Help Guide</h3>
+        <p style="margin:2px 0 0; font-size:12px; color:#94a3b8;">BRAC Institute of Educational Development (BRAC IED) &bull; Developer: Wasik Ahmed Khan</p>
+      </div>
+      <button class="modal-close" style="color:#fff; font-size:24px;" onclick="closeManualModal()">&times;</button>
+    </div>
+
+    <!-- Interactive Navigation Tabs -->
+    <div style="display:flex; background:#1e293b; padding:0 20px; border-bottom:1px solid #334155; gap:4px; overflow-x:auto;">
+      <button class="manual-tab active" onclick="switchManualTab('quickstart', this)">🚀 Quick Start</button>
+      <button class="manual-tab" onclick="switchManualTab('roles', this)">🔑 Roles &amp; Scopes</button>
+      <button class="manual-tab" onclick="switchManualTab('uploads', this)">📥 File Uploads</button>
+      <button class="manual-tab" onclick="switchManualTab('pdf', this)">📄 Live PDF Preview</button>
+      <button class="manual-tab" onclick="switchManualTab('excel', this)">📊 Excel Reports</button>
+      <button class="manual-tab" onclick="switchManualTab('admin', this)">👑 Admin Panel</button>
+    </div>
+
+    <div style="padding:24px; overflow-y:auto; max-height:72vh; font-size:13px; line-height:1.6; color:#334155; background:#f8fafc;">
+      
+      <!-- Tab 1: Quick Start -->
+      <div id="tab-quickstart" class="manual-tab-content">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+            <div style="width:36px; height:36px; background:#eff6ff; color:#2563eb; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; margin-bottom:10px;">1</div>
+            <h4 style="margin:0 0 6px; font-size:14px; color:#1e293b;">Upload Files</h4>
+            <p style="margin:0; font-size:11px; color:#64748b;">Upload Database CSV/Excel &amp; Tax Challans from left sidebar.</p>
+          </div>
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+            <div style="width:36px; height:36px; background:#f0fdf4; color:#16a34a; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; margin-bottom:10px;">2</div>
+            <h4 style="margin:0 0 6px; font-size:14px; color:#1e293b;">Search &amp; Filter</h4>
+            <p style="margin:0; font-size:11px; color:#64748b;">Filter by department, tax status, or PIN in real time.</p>
+          </div>
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+            <div style="width:36px; height:36px; background:#faf5ff; color:#9333ea; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; margin-bottom:10px;">3</div>
+            <h4 style="margin:0 0 6px; font-size:14px; color:#1e293b;">Generate PDF</h4>
+            <p style="margin:0; font-size:11px; color:#64748b;">Preview, edit name/designation, and download statements.</p>
+          </div>
+        </div>
+
+        <div style="background:#fff; border:1px solid #cbd5e1; border-left:4px solid #0ea5e9; border-radius:8px; padding:14px 18px; margin-bottom:16px;">
+          <div style="font-weight:700; color:#0369a1; margin-bottom:4px;">🔢 Lakh/Crore Currency Formatting Rule</div>
+          <p style="margin:0; font-size:12px; color:#334155;">
+            All system totals and PDF figures follow South Asian currency rules:<br>
+            <strong><code>1,000</code></strong> &bull; <strong><code>10,000</code></strong> &bull; <strong><code>1,00,000</code></strong> <em>(1 Lakh)</em> &bull; <strong><code>10,00,000</code></strong> <em>(10 Lakh)</em>
+          </p>
+        </div>
+
+        <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 18px;">
+          <div style="font-weight:700; color:#1e293b; margin-bottom:4px;">⌨️ Helpful Keyboard Shortcuts</div>
+          <div style="display:flex; gap:20px; font-size:12px; color:#475569;">
+            <div><kbd style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-family:monospace; font-weight:700;">Esc</kbd> Close modal windows</div>
+            <div><kbd style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-family:monospace; font-weight:700;">/</kbd> Focus search bar instantly</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Roles -->
+      <div id="tab-roles" class="manual-tab-content" style="display:none;">
+        <h4 style="color:#0f172a; margin:0 0 12px; font-size:14px;">🔑 Access Control &amp; Department Scoping</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+            <div style="font-weight:700; color:#2563eb; margin-bottom:4px;">★ Full Access Users</div>
+            <p style="margin:0; font-size:12px; color:#475569;"><strong>Super Admin, Finance, &amp; HR</strong> view all employee records across all departments without restriction.</p>
+          </div>
+          <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+            <div style="font-weight:700; color:#059669; margin-bottom:4px;">🏢 Department Scoped Users</div>
+            <p style="margin:0; font-size:12px; color:#475569;"><strong>Department Managers</strong> (e.g. BRAC IED) view and export data scoped strictly to their assigned unit.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Uploads -->
+      <div id="tab-uploads" class="manual-tab-content" style="display:none;">
+        <h4 style="color:#0f172a; margin:0 0 12px; font-size:14px;">📥 Data Upload Specifications</h4>
+        <p style="margin-bottom:10px; color:#475569;">Upload CSV or Excel files (<code>.xlsx</code>/<code>.xls</code>) in the left sidebar. Files auto-parse PIN, Gender, TIN, Department, Monthly Basic, Allowances, Arrears, and Tax Challans.</p>
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; font-size:12px; color:#1e40af;">
+          💡 <strong>Need Template Files?</strong> Click <strong>📥 Sample Files</strong> in the top header bar to download pre-formatted CSV templates.
+        </div>
+      </div>
+
+      <!-- Tab 4: PDF Certificates -->
+      <div id="tab-pdf" class="manual-tab-content" style="display:none;">
+        <h4 style="color:#0f172a; margin:0 0 12px; font-size:14px;">📄 Live PDF Preview &amp; On-the-Fly Editing</h4>
+        <p style="margin-bottom:10px; color:#475569;">Click <strong>PDF Statement</strong> on any employee row to open the live preview window. Type in custom Employee Name or Designation fields in the modal header—the PDF updates live in real time!</p>
+      </div>
+
+      <!-- Tab 5: Excel Reports -->
+      <div id="tab-excel" class="manual-tab-content" style="display:none;">
+        <h4 style="color:#0f172a; margin:0 0 12px; font-size:14px;">📊 Exporting Excel Summaries</h4>
+        <p style="margin-bottom:10px; color:#475569;">Click <strong>📊 Export Excel Summary</strong> to generate a formatted multi-sheet Excel workbook containing Employee Salary Summaries and Tax Challan Logs.</p>
+      </div>
+
+      <!-- Tab 6: Admin -->
+      <div id="tab-admin" class="manual-tab-content" style="display:none;">
+        <h4 style="color:#0f172a; margin:0 0 12px; font-size:14px;">👑 Admin User &amp; Scope Management</h4>
+        <p style="margin-bottom:10px; color:#475569;">System Admins can click <strong>👑 Manage Users &amp; Scopes</strong> in the header to create new user accounts, assign roles, and grant department access scopes with persistent JSON storage.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Detail Drawer Overlay & Container -->
+<div id="drawerOverlay" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.4); backdrop-filter:blur(2px); z-index:140;" onclick="closeDetail()"></div>
+
+<div class="drawer" id="detailDrawer">
+  <div class="drawer-header">
+    <h3 id="detailTitle" style="font-size:16px; font-weight:700; margin:0;">PIN Detail</h3>
+    <button class="modal-close" onclick="closeDetail()">&times;</button>
+  </div>
+  <div class="drawer-body" id="detailBody">
+  </div>
+</div>
+
+<button id="floatingHelpBtn" onclick="openManualModal()" style="position:fixed; bottom:24px; right:24px; z-index:100; background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:10px 18px; border-radius:30px; font-weight:700; font-size:13px; cursor:pointer; box-shadow:0 10px 25px -5px rgba(0,0,0,0.3); display:flex; align-items:center; gap:8px;">
+  <span style="font-size:16px;">📖</span> User Manual &amp; Help
+</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let employees = [];
+let currentFilteredData = [];
+let currentFilter = 'all';
+let sortCol = -1, sortAsc = true;
+let activePreviewPin = null;
+let debounceTimer = null;
+let searchDebounceTimer = null;
+let currentPage = 1;
+let pageSize = 50;
+let currentUser = null;
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function fmt(n) {
+  if (n == null || n === '') return '-';
+  var num = Math.round(Number(n));
+  if (isNaN(num) || num === 0) return '-';
+
+  var isNeg = num < 0;
+  var s = Math.abs(num).toString();
+
+  if (s.length <= 3) {
+    return 'BDT ' + (isNeg ? '-' : '') + s;
+  }
+
+  var lastThree = s.substring(s.length - 3);
+  var otherDigits = s.substring(0, s.length - 3);
+  var formattedOther = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+
+  return 'BDT ' + (isNeg ? '-' : '') + formattedOther + ',' + lastThree;
+}
+
+function fmtShort(n) {
+  if (!n) return 'BDT 0';
+  return fmt(n);
+}
+
+let selectedFiscalYear = '';
+
+async function loadFiscalYears() {
+  try {
+    const resp = await fetch('/api/fiscal-years?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    const data = await resp.json();
+    const select = document.getElementById('fySelect');
+    if (!select) return;
+
+    const fys = data.fiscal_years || [];
+    if (!selectedFiscalYear && data.active_fiscal_year) {
+      selectedFiscalYear = data.active_fiscal_year;
+    }
+
+    let optionsHtml = '<option value="all" ' + (selectedFiscalYear === 'all' ? 'selected' : '') + ' style="background:#0f172a; color:#fbbf24; font-weight:800; font-size:13px;">🌐 All Fiscal Years Combined</option>';
+    fys.forEach(fy => {
+      const isSel = (fy === selectedFiscalYear) ? 'selected' : '';
+      optionsHtml += `<option value="${fy}" ${isSel} style="background:#0f172a; color:#38bdf8; font-weight:800; font-size:13px;">📅 FY ${fy}</option>`;
+    });
+
+    select.innerHTML = optionsHtml;
+    updateFiscalYearBadges(selectedFiscalYear);
+  } catch (e) {
+    console.error('loadFiscalYears error:', e);
+  }
+}
+
+function updateFiscalYearBadges(fy) {
+  const label = (fy === 'all' ? 'All Fiscal Years' : ('FY ' + fy));
+  const tagEl = document.getElementById('headerFyText');
+  if (tagEl) tagEl.textContent = label;
+
+  const badgeEl = document.getElementById('activeFyBadge');
+  if (badgeEl) badgeEl.textContent = '📅 ' + label;
+
+  const pdfBadgeEl = document.getElementById('pdfFyBadge');
+  if (pdfBadgeEl) pdfBadgeEl.textContent = label;
+}
+
+async function changeFiscalYear(fy) {
+  selectedFiscalYear = fy;
+  updateFiscalYearBadges(fy);
+  showToast('Switched Active Context to ' + (fy === 'all' ? 'All Fiscal Years Combined' : ('FY ' + fy)));
+  await Promise.all([loadEmployees(), checkStatus(), refreshAuditData()]);
+}
+
+async function loadStats() {
+  try {
+    const resp = await fetch('/api/stats?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    const st = await resp.json();
+    document.getElementById('kpiTotalEmp').textContent = (st.total_employees || 0).toLocaleString();
+    document.getElementById('kpiGenderSub').textContent = (st.male_count || 0) + ' Male / ' + (st.female_count || 0) + ' Female';
+    document.getElementById('kpiTotalNet').textContent = fmtShort(st.total_net);
+    document.getElementById('kpiGrossSub').textContent = 'FY ' + (st.active_fiscal_year || '2025-2026') + ' Gross';
+    document.getElementById('kpiTaxClaimed').textContent = fmtShort(st.total_tax_claimed);
+    document.getElementById('kpiChallanSub').textContent = (st.total_challans || 0).toLocaleString() + ' Total Challans';
+    document.getElementById('kpiCompliance').textContent = (st.tax_compliance_pct || 0) + '%';
+    document.getElementById('kpiTaxEmpSub').textContent = (st.tax_emp_count || 0) + ' of ' + (st.total_employees || 0) + ' with tax';
+  } catch (e) {
+    console.error('loadStats error:', e);
+  }
+}
+
+async function checkStatus() {
+  try {
+    const resp = await fetch('/api/status?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    const s = await resp.json();
+    if (s.user) {
+      currentUser = s.user;
+      document.getElementById('userName').textContent = s.user.name || s.user.username;
+      document.getElementById('userDept').textContent = s.user.department || 'Department';
+      if (s.user.role === 'Super Admin' || s.user.username === 'admin') {
+        document.getElementById('btnManageUsers').style.display = 'inline-flex';
+      }
+    }
+    await loadFiscalYears();
+    if (s.database_count > 0) {
+      document.getElementById('dbCount').textContent = s.database_count + ' records (' + (s.active_fiscal_year ? ('FY ' + s.active_fiscal_year) : '') + ')';
+      document.getElementById('dbUpload').classList.add('loaded');
+      document.getElementById('btnExportExcel').style.display = 'inline-flex';
+      document.getElementById('sidebarExportExcel').disabled = false;
+      document.getElementById('dbReplace').style.display = 'inline-block';
+      document.getElementById('dbRemove').style.display = 'inline-block';
+    } else {
+      document.getElementById('dbCount').textContent = 'Not Loaded';
+      document.getElementById('dbUpload').classList.remove('loaded');
+      document.getElementById('dbDate').textContent = '';
+      document.getElementById('dbReplace').style.display = 'none';
+      document.getElementById('dbRemove').style.display = 'none';
+      document.getElementById('btnExportExcel').style.display = 'none';
+      document.getElementById('sidebarExportExcel').disabled = true;
+    }
+    if (s.tax_count > 0) {
+      document.getElementById('taxCount').textContent = s.tax_count + ' challans (' + s.tax_pins + ' PINs)';
+      document.getElementById('taxUpload').classList.add('loaded');
+      document.getElementById('taxReplace').style.display = 'inline-block';
+      document.getElementById('taxRemove').style.display = 'inline-block';
+    } else {
+      document.getElementById('taxCount').textContent = 'Not Loaded';
+      document.getElementById('taxUpload').classList.remove('loaded');
+      document.getElementById('taxDate').textContent = '';
+      document.getElementById('taxReplace').style.display = 'none';
+      document.getElementById('taxRemove').style.display = 'none';
+    }
+    if (s.meta && s.meta.database) {
+      document.getElementById('dbDate').textContent = s.meta.database.filename;
+    }
+    if (s.meta && s.meta.tax) {
+      document.getElementById('taxDate').textContent = s.meta.tax.filename;
+    }
+  } catch (e) {}
+}
+
+async function removeUploadedFile(type, event) {
+  if (event) event.stopPropagation();
+  const label = type === 'database' ? 'Employee Database' : 'Tax Challan Info';
+  if (!confirm('Are you sure you want to remove the uploaded ' + label + ' records for ' + (selectedFiscalYear === 'all' ? 'All Fiscal Years' : ('FY ' + selectedFiscalYear)) + '?')) return;
+
+  showToast('Removing ' + label + '...');
+  try {
+    const resp = await fetch('/api/upload/' + type + '?fiscal_year=' + encodeURIComponent(selectedFiscalYear), { method: 'DELETE' });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    showToast(data.message || (label + ' removed successfully!'));
+    await loadFiscalYears();
+    await loadEmployees();
+    await checkStatus();
+    await refreshAuditData();
+  } catch (e) {
+    showToast('Failed to remove: ' + e.message);
+  }
+}
+
+async function uploadFile(type) {
+  const input = document.getElementById(type === 'database' ? 'dbFile' : 'taxFile');
+  const file = input.files[0];
+  if (!file) return;
+
+  const fd = new FormData();
+  fd.append('file', file);
+
+  showToast('Uploading & parsing ' + file.name + '...');
+  try {
+    const resp = await fetch('/api/upload/' + type + '?fiscal_year=' + encodeURIComponent(selectedFiscalYear), { method: 'POST', body: fd });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    if (data.fiscal_year) {
+      selectedFiscalYear = data.fiscal_year;
+    }
+
+    showToast(type.charAt(0).toUpperCase() + type.slice(1) + ' saved for FY ' + (data.fiscal_year || selectedFiscalYear) + '!');
+    await loadFiscalYears();
+    await loadEmployees();
+    await checkStatus();
+    await refreshAuditData();
+  } catch (e) {
+    showToast('Upload failed: ' + e.message);
+  }
+}
+
+document.getElementById('dbFile').addEventListener('change', () => uploadFile('database'));
+document.getElementById('taxFile').addEventListener('change', () => uploadFile('tax'));
+document.getElementById('dbUpload').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') document.getElementById('dbFile').click();
+});
+document.getElementById('taxUpload').addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') document.getElementById('taxFile').click();
+});
+document.getElementById('dbReplace').addEventListener('click', (e) => {
+  e.stopPropagation(); document.getElementById('dbFile').click();
+});
+document.getElementById('taxReplace').addEventListener('click', (e) => {
+  e.stopPropagation(); document.getElementById('taxFile').click();
+});
+
+async function loadEmployees() {
+  try {
+    const resp = await fetch('/api/employees?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    employees = await resp.json();
+    applyFilterAndRender();
+    await loadStats();
+  } catch (e) { console.error(e); }
+}
+
+function setFilter(type, el) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  applyFilterAndRender();
+}
+
+function applyFilterAndRender() {
+  currentPage = 1;
+  let filtered = [...employees];
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  if (currentFilter === 'taxed') filtered = filtered.filter(e => e.tax_records_count > 0);
+  else if (currentFilter === 'notax') filtered = filtered.filter(e => e.tax_records_count === 0);
+
+  if (q) {
+    filtered = filtered.filter(e =>
+      e.pin.toLowerCase().includes(q) ||
+      e.gender.toLowerCase().includes(q) ||
+      e.tin.toLowerCase().includes(q)
+    );
+  }
+
+  currentFilteredData = filtered;
+  renderCurrentPage();
+}
+
+function debouncedSearch() {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(applyFilterAndRender, 120);
+}
+
+document.getElementById('searchInput').addEventListener('input', debouncedSearch);
+
+function renderCurrentPage() {
+  const container = document.getElementById('tableContainer');
+  if (!currentFilteredData.length) {
+    container.innerHTML = '<div class="empty-state"><h3>No employees matching criteria</h3></div>';
+    return;
+  }
+
+  const totalPages = Math.ceil(currentFilteredData.length / pageSize);
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, currentFilteredData.length);
+  const pageData = currentFilteredData.slice(startIdx, endIdx);
+
+  let html = '<table><thead><tr>';
+  html += '<th onclick="sortTable(0)">PIN</th>';
+  html += '<th onclick="sortTable(1)">Gender</th>';
+  html += '<th onclick="sortTable(2)">TIN</th>';
+  html += '<th onclick="sortTable(3)">Gross Salary</th>';
+  html += '<th onclick="sortTable(4)">Net Total</th>';
+  html += '<th onclick="sortTable(5)">Tax Claimed</th>';
+  html += '<th>Tax Records</th>';
+  html += '<th style="text-align:right">Actions</th>';
+  html += '</tr></thead><tbody>';
+
+  pageData.forEach(e => {
+    const gBadge = e.gender.toLowerCase() === 'male' ? 'badge-male' : 'badge-female';
+    const taxBadge = e.tax_records_count > 0 ? '<span class="badge badge-tax">' + e.tax_records_count + ' challans</span>' : '<span class="badge badge-none">None</span>';
+
+    html += '<tr>';
+    html += '<td><strong>' + e.pin + '</strong></td>';
+    html += '<td><span class="badge ' + gBadge + '">' + e.gender + '</span></td>';
+    html += '<td><span style="font-family:monospace;font-size:12px">' + (e.tin || '-') + '</span></td>';
+    html += '<td>' + fmt(e.gross) + '</td>';
+    html += '<td style="font-weight:700;color:var(--primary)">' + fmt(e.net_total) + '</td>';
+    html += '<td style="font-weight:600;color:var(--success)">' + fmt(e.total_claim) + '</td>';
+    html += '<td>' + taxBadge + '</td>';
+    html += '<td style="text-align:right"><div style="display:inline-flex;gap:6px;">';
+    html += '<button class="btn btn-outline btn-sm" onclick="viewDetail(\'' + e.pin + '\')">Details</button>';
+    html += '<button class="btn btn-primary btn-sm" onclick="openPdfPreview(\'' + e.pin + '\')">PDF Statement</button>';
+    html += '</div></td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+
+  // Pagination Footer Bar
+  html += '<div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#f8fafc; border-top:1px solid var(--border); font-size:12px;">';
+  html += '<div style="color:var(--text-muted);">Showing <strong>' + (startIdx + 1) + '-' + endIdx + '</strong> of <strong>' + currentFilteredData.length + '</strong> employees</div>';
+  html += '<div style="display:flex; align-items:center; gap:8px;">';
+  html += '<button class="btn btn-outline btn-sm" onclick="changePage(-1)" ' + (currentPage === 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '') + '>← Previous</button>';
+  html += '<span style="font-weight:600;">Page ' + currentPage + ' of ' + totalPages + '</span>';
+  html += '<button class="btn btn-outline btn-sm" onclick="changePage(1)" ' + (currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : '') + '>Next →</button>';
+  html += '</div></div>';
+
+  container.innerHTML = html;
+}
+
+function changePage(delta) {
+  currentPage += delta;
+  renderCurrentPage();
+  const elem = document.getElementById('tableContainer');
+  if (elem) elem.scrollTop = 0;
+}
+
+function sortTable(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  const keys = ['pin', 'gender', 'tin', 'gross', 'net_total', 'total_claim'];
+  const k = keys[col];
+  employees.sort((a, b) => {
+    let va = a[k] || '', vb = b[k] || '';
+    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  });
+  applyFilterAndRender();
+}
+
+let pendingPinAction = null;
+
+// In-Browser Live PDF Preview Modal with TIN Prompt & Real-time Update
+function openPdfPreview(pin, bypassTinCheck = false) {
+  const emp = employees.find(e => e.pin === pin);
+  const tinStr = emp ? (emp.tin || '').toString().trim() : '';
+
+  if (!bypassTinCheck && (!tinStr || tinStr === '' || tinStr === '-' || tinStr.toLowerCase() === 'n/a')) {
+    pendingPinAction = { action: 'preview', pin: pin };
+    document.getElementById('missingTinPromptText').innerHTML = `Employee PIN <strong>${pin}</strong> does not have a Tax Identification Number (TIN). Please enter the 12-digit TIN below to include it on the PDF statement.`;
+    document.getElementById('promptTinInput').value = '';
+    document.getElementById('missingTinModal').classList.add('show');
+    setTimeout(() => {
+      const inp = document.getElementById('promptTinInput');
+      if (inp) inp.focus();
+    }, 150);
+    return;
+  }
+
+  activePreviewPin = pin;
+  document.getElementById('pdfName').value = emp ? (emp.name || '') : '';
+  document.getElementById('pdfDesignation').value = emp ? (emp.designation || '') : '';
+  document.getElementById('pdfTin').value = tinStr;
+  refreshPdfPreviewFrame();
+  document.getElementById('pdfModal').classList.add('show');
+}
+
+function closeMissingTinModal() {
+  document.getElementById('missingTinModal').classList.remove('show');
+  pendingPinAction = null;
+}
+
+async function saveTinAndGeneratePdf() {
+  const tinVal = document.getElementById('promptTinInput').value.trim();
+  if (!tinVal) {
+    showToast('Please enter a valid TIN or click Skip');
+    return;
+  }
+  if (!pendingPinAction) return;
+
+  const targetPin = pendingPinAction.pin;
+  const targetAction = pendingPinAction.action;
+
+  showToast('Saving TIN...');
+  try {
+    const resp = await fetch('/api/employee/' + encodeURIComponent(targetPin) + '/update?fiscal_year=' + encodeURIComponent(selectedFiscalYear), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tin: tinVal })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    const emp = employees.find(e => e.pin === targetPin);
+    if (emp) emp.tin = tinVal;
+    applyFilterAndRender();
+
+    showToast('TIN saved successfully!');
+    closeMissingTinModal();
+
+    if (targetAction === 'preview') {
+      openPdfPreview(targetPin, true);
+    } else if (targetAction === 'download') {
+      downloadCurrentPdf(targetPin);
+    }
+  } catch (e) {
+    showToast('Failed to save TIN: ' + e.message);
+  }
+}
+
+function skipAndGeneratePdf() {
+  if (!pendingPinAction) return;
+  const targetPin = pendingPinAction.pin;
+  const targetAction = pendingPinAction.action;
+  closeMissingTinModal();
+
+  if (targetAction === 'preview') {
+    openPdfPreview(targetPin, true);
+  } else if (targetAction === 'download') {
+    downloadCurrentPdf(targetPin);
+  }
+}
+
+function closePdfModal() {
+  document.getElementById('pdfModal').classList.remove('show');
+  document.getElementById('pdfFrame').src = 'about:blank';
+  activePreviewPin = null;
+}
+
+function refreshPdfPreviewFrame() {
+  if (!activePreviewPin) return;
+  const name = encodeURIComponent(document.getElementById('pdfName').value.trim());
+  const desg = encodeURIComponent(document.getElementById('pdfDesignation').value.trim());
+  const tin = encodeURIComponent(document.getElementById('pdfTin').value.trim());
+  const useLh = document.getElementById('pdfUseLetterhead').checked ? '1' : '0';
+  const url = '/api/preview/' + encodeURIComponent(activePreviewPin) + '?name=' + name + '&designation=' + desg + '&tin=' + tin + '&fiscal_year=' + encodeURIComponent(selectedFiscalYear) + '&letterhead=' + useLh;
+  document.getElementById('pdfFrame').src = url;
+}
+
+function debounceRefreshPreview() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(refreshPdfPreviewFrame, 400);
+}
+
+async function downloadCurrentPdf() {
+  if (!activePreviewPin) return;
+  const name = encodeURIComponent(document.getElementById('pdfName').value.trim());
+  const desg = encodeURIComponent(document.getElementById('pdfDesignation').value.trim());
+  const tin = encodeURIComponent(document.getElementById('pdfTin').value.trim());
+  const useLh = document.getElementById('pdfUseLetterhead').checked ? '1' : '0';
+  showToast('Generating PDF statement...');
+  try {
+    const resp = await fetch('/api/generate/' + encodeURIComponent(activePreviewPin) + '?name=' + name + '&designation=' + desg + '&tin=' + tin + '&fiscal_year=' + encodeURIComponent(selectedFiscalYear) + '&letterhead=' + useLh);
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    window.location.href = '/download/' + data.batch_id + '/' + data.filename;
+    showToast('PDF downloaded!');
+  } catch (e) { showToast('Error downloading PDF: ' + e.message); }
+}
+
+function triggerLetterheadUpload() {
+  const fileInput = document.getElementById('letterheadFileInput');
+  if (fileInput) fileInput.click();
+}
+
+async function uploadLetterheadImage(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('file', file);
+
+  showToast('Uploading custom letterhead image...');
+  try {
+    const resp = await fetch('/api/settings/letterhead', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    showToast('Custom letterhead image uploaded successfully!');
+    const lhCheckbox = document.getElementById('pdfUseLetterhead');
+    if (lhCheckbox) {
+      lhCheckbox.checked = true;
+      debounceRefreshPreview();
+    }
+  } catch (e) {
+    showToast('Failed to upload letterhead: ' + e.message);
+  } finally {
+    input.value = '';
+  }
+}
+
+// Detail Drawer
+async function viewDetail(pin) {
+  try {
+    const resp = await fetch('/api/employee/' + encodeURIComponent(pin) + '?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    const data = await resp.json();
+    if (data.error) { showToast(data.error); return; }
+    const e = data.employee;
+    const tax = data.tax_records || [];
+
+    let totalClaim = 0;
+    tax.forEach(t => { totalClaim += (t.claim_amount || 0); });
+
+    const titleEl = document.getElementById('detailTitle');
+    if (titleEl) titleEl.textContent = 'PIN: ' + (e.pin || '');
+
+    let html = '';
+    html += '<div class="detail-grid">';
+    html += '<div class="detail-item"><span class="lbl">PIN Number</span><span class="val">' + (e.pin || 'N/A') + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">Gender</span><span class="val">' + (e.gender || 'N/A') + '</span></div>';
+    html += '<div class="detail-item" style="grid-column:span 2;"><span class="lbl">TIN Number (Editable)</span><div style="display:flex; gap:6px; margin-top:4px;"><input type="text" id="drawerTinInput" value="' + (e.tin || '') + '" placeholder="Enter 12-Digit TIN" style="background:#fff; border:1px solid #cbd5e1; padding:6px 10px; border-radius:6px; font-size:12px; font-weight:700; flex:1; outline:none;"><button class="btn btn-primary btn-sm" onclick="updateTinFromDrawer(\'' + e.pin + '\')">💾 Save TIN</button></div></div>';
+    html += '<div class="detail-item" style="grid-column:span 2;"><span class="lbl">Total Tax Claimed</span><span class="val" style="color:var(--success); font-weight:700;">' + fmt(totalClaim) + '</span></div>';
+    html += '</div>';
+
+    const fyLabel = (selectedFiscalYear && selectedFiscalYear !== 'all') ? ('FY ' + selectedFiscalYear) : 'Active Fiscal Year';
+    html += '<div><div class="drawer-section-title">Salary Component Summary (' + fyLabel + ')</div><div style="margin-top:10px" class="detail-grid">';
+    html += '<div class="detail-item"><span class="lbl">Basic (50%)</span><span class="val">' + fmt(e.basic) + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">House Rent (30%)</span><span class="val">' + fmt(e.house_rent) + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">Medical (10%)</span><span class="val">' + fmt(e.medical_allowance) + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">Conveyance (10%)</span><span class="val">' + fmt(e.conveyance_allowance) + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">Festival Bonus</span><span class="val">' + fmt(e.festival_bonus) + '</span></div>';
+    html += '<div class="detail-item"><span class="lbl">Arrears &amp; Others</span><span class="val">' + fmt((e.arrears || 0) + (e.others || 0)) + '</span></div>';
+    html += '<div class="detail-item" style="grid-column:span 2; background:#f8fafc; padding:10px; border-radius:8px"><span class="lbl">Net Total Salary</span><span class="val" style="font-size:18px; color:var(--primary)">' + fmt(e.net_total) + '</span></div>';
+    html += '</div></div>';
+
+    // 12-Month Salary Breakdown Grid
+    const monthNames = ["July", "August", "September", "October", "November", "December", "January", "February", "March", "April", "May", "June"];
+    const monthlyVals = e.monthly_salary || [0,0,0,0,0,0,0,0,0,0,0,0];
+    const sYr = e.start_year || 2025;
+    const eYr = e.end_year || 2026;
+
+    html += '<div><div class="drawer-section-title">📅 12-Month Monthly Salary Breakdown (' + sYr + ' - ' + eYr + ')</div>';
+    html += '<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:10px;">';
+    monthNames.forEach((m, idx) => {
+      const yr = idx < 6 ? sYr : eYr;
+      const amt = monthlyVals[idx] || 0;
+      html += '<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; font-size:12px;">';
+      html += '<div style="color:#64748b; font-size:10px; font-weight:700; text-transform:uppercase;">' + m + ' ' + yr + '</div>';
+      html += '<div style="font-weight:700; color:#0f172a; margin-top:2px;">' + fmt(amt) + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+
+    html += '<div><div class="drawer-section-title">Tax Deduction &amp; Challans (' + tax.length + ')</div>';
+    html += '<div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:12px 16px; border-radius:10px; margin:10px 0; display:flex; justify-content:space-between; align-items:center;">';
+    html += '<div><span class="lbl" style="color:#047857; font-size:11px; font-weight:700;">TOTAL TAX DEDUCTED / CLAIMED</span><div style="font-size:18px; font-weight:800; color:#047857; margin-top:2px;">' + fmt(totalClaim) + '</div></div>';
+    html += '<div style="text-align:right;"><span class="lbl" style="color:#047857; font-size:11px; font-weight:700;">FILED CHALLANS</span><div style="font-size:16px; font-weight:800; color:#047857; margin-top:2px;">' + tax.length + '</div></div>';
+    html += '</div>';
+
+    if (tax.length) {
+      html += '<table style="margin-top:10px; font-size:12px"><thead><tr><th>Month</th><th>Challan No</th><th>Date</th><th>Claimed</th><th>Bank</th></tr></thead><tbody>';
+      tax.forEach(t => {
+        html += '<tr><td>' + (t.month || '-') + '</td><td>' + (t.challan_no || '-') + '</td><td>' + (t.challan_date || '-') + '</td><td><strong>' + fmt(t.claim_amount) + '</strong></td><td>' + (t.bank_info || '-') + '</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<p style="font-size:12px; color:var(--text-muted); margin-top:8px">No tax challan records found for this PIN.</p>';
+    }
+    html += '</div>';
+
+    html += '<div style="margin-top:auto;"><button class="btn btn-primary" style="width:100%" onclick="closeDetail(); openPdfPreview(\'' + e.pin + '\')">Generate PDF Statement</button></div>';
+
+    const bodyEl = document.getElementById('detailBody');
+    const drawerEl = document.getElementById('detailDrawer');
+    const overlayEl = document.getElementById('drawerOverlay');
+
+    if (bodyEl) bodyEl.innerHTML = html;
+    if (drawerEl) drawerEl.classList.add('open');
+    if (overlayEl) overlayEl.style.display = 'block';
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+function closeDetail() {
+  const drawerEl = document.getElementById('detailDrawer');
+  const overlayEl = document.getElementById('drawerOverlay');
+  if (drawerEl) drawerEl.classList.remove('open');
+  if (overlayEl) overlayEl.style.display = 'none';
+}
+
+async function updateTinFromDrawer(pin) {
+  const input = document.getElementById('drawerTinInput');
+  if (!input) return;
+  const newTin = input.value.trim();
+  showToast('Updating TIN for PIN ' + pin + '...');
+  try {
+    const resp = await fetch('/api/employee/' + encodeURIComponent(pin) + '/update?fiscal_year=' + encodeURIComponent(selectedFiscalYear), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tin: newTin })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    const emp = employees.find(e => e.pin === pin);
+    if (emp) emp.tin = newTin;
+    applyFilterAndRender();
+    showToast('TIN updated to ' + (newTin || 'blank') + '!');
+  } catch (e) {
+    showToast('Error updating TIN: ' + e.message);
+  }
+}
+
+// Exports
+function triggerExportExcel() {
+  showToast('Generating Summary Excel file...');
+  window.location.href = '/api/export/excel?fiscal_year=' + encodeURIComponent(selectedFiscalYear);
+}
+
+document.getElementById('btnExportExcel').addEventListener('click', triggerExportExcel);
+document.getElementById('sidebarExportExcel').addEventListener('click', triggerExportExcel);
+
+document.getElementById('btnDownloadSample').addEventListener('click', () => {
+  const dbCsv = 'Dummy PIN,Gender,TIN,Jul 2025,Aug 2025,Sep 2025,Oct 2025,Nov 2025,Dec 2025,Jan 2026,Feb 2026,Mar 2026,Apr 2026,May 2026,Jun 2026,Festival Bonus,Arrears,Others\n10001,Male,123456789012,45000,45000,45000,45000,45000,45000,45000,45000,45000,45000,45000,45000,45000,0,0\n10002,Female,987654321098,52000,52000,52000,52000,52000,52000,52000,52000,52000,52000,52000,52000,52000,5000,2000';
+  const taxCsv = 'Dummy PIN,Month,A-Challan No,Challan Date,Claim Amount,Total A-Challan Amount,Bank Information\n10001,Jul 2025,CH001,2025-07-15,3500,3500,Sonali Bank\n10001,Aug 2025,CH002,2025-08-15,3500,7000,Sonali Bank\n10001,Sep 2025,CH003,2025-09-15,3500,10500,Sonali Bank\n10002,Jul 2025,CH010,2025-07-18,4200,4200,BRAC Bank\n10002,Aug 2025,CH011,2025-08-18,4200,8400,BRAC Bank';
+  const blob1 = new Blob([dbCsv], {type:'text/csv'});
+  const blob2 = new Blob([taxCsv], {type:'text/csv'});
+  const a1 = document.createElement('a'); a1.href = URL.createObjectURL(blob1); a1.download = 'sample_database.csv'; a1.click();
+  setTimeout(() => { const a2 = document.createElement('a'); a2.href = URL.createObjectURL(blob2); a2.download = 'sample_tax_info.csv'; a2.click(); }, 500);
+});
+
+// Admin User & Access Scope Management
+let currentLoadedUsers = [];
+
+async function openUserModal() {
+  document.getElementById('userModal').classList.add('show');
+  await loadUserList();
+}
+
+function closeUserModal() {
+  document.getElementById('userModal').classList.remove('show');
+}
+
+async function loadUserList() {
+  const wrap = document.getElementById('usersTableWrap');
+  try {
+    const resp = await fetch('/api/users');
+    const users = await resp.json();
+    if (users.error) { wrap.innerHTML = '<p style="color:red">'+users.error+'</p>'; return; }
+    currentLoadedUsers = users;
+
+    let html = '<table style="font-size:12px;"><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Access Scope</th><th style="text-align:right">Actions</th></tr></thead><tbody>';
+    users.forEach((u, idx) => {
+      const isFull = u.department === 'All Departments' || u.role.includes('Full Access') || u.role === 'Super Admin';
+      const scopeBadge = isFull ? '<span class="badge badge-male">★ Full Access</span>' : '<span class="badge badge-tax">' + u.department + '</span>';
+      
+      const editBtn = '<button class="btn btn-outline btn-sm" style="color:#f59e0b; border-color:rgba(245,158,11,0.4);" onclick="openEditUserModal(' + idx + ')">✏️ Edit</button>';
+      const delBtn = u.username === 'admin' ? '<span style="color:#cbd5e1;font-size:11px; margin-left:6px;">System Primary</span>' : '<button class="btn btn-outline btn-sm" style="color:#ef4444; border-color:rgba(239,68,68,0.4); margin-left:6px;" onclick="deleteUserAccount(\'' + u.username + '\')">Delete</button>';
+      
+      html += '<tr><td><strong>' + u.username + '</strong></td><td>' + (u.name || '-') + '</td><td>' + u.role + '</td><td>' + scopeBadge + '</td><td style="text-align:right"><div style="display:inline-flex; align-items:center;">' + editBtn + delBtn + '</div></td></tr>';
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch (e) { wrap.innerHTML = '<p style="color:red">Failed to load users: '+e.message+'</p>'; }
+}
+
+function openEditUserModal(userIndex) {
+  const u = currentLoadedUsers[userIndex];
+  if (!u) return;
+  document.getElementById('editTargetUsername').value = u.username;
+  document.getElementById('editUsernameInput').value = u.username;
+  document.getElementById('editNameInput').value = u.name || '';
+  document.getElementById('editPasswordInput').value = '';
+  document.getElementById('editRoleSelect').value = u.role || 'Department Manager';
+  document.getElementById('editDeptSelect').value = u.department || 'BRAC IED';
+  document.getElementById('editUserModal').classList.add('show');
+}
+
+function closeEditUserModal() {
+  document.getElementById('editUserModal').classList.remove('show');
+}
+
+async function saveAdminUserEdit() {
+  const targetUsername = document.getElementById('editTargetUsername').value;
+  const newUsername = document.getElementById('editUsernameInput').value.trim();
+  const name = document.getElementById('editNameInput').value.trim();
+  const password = document.getElementById('editPasswordInput').value.trim();
+  const role = document.getElementById('editRoleSelect').value;
+  const department = document.getElementById('editDeptSelect').value;
+
+  if (!newUsername) { showToast('Username cannot be empty'); return; }
+
+  showToast('Saving user account changes...');
+  try {
+    const resp = await fetch('/api/users/' + encodeURIComponent(targetUsername), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        new_username: newUsername,
+        name: name,
+        password: password,
+        role: role,
+        department: department
+      })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('User "' + newUsername + '" updated successfully!');
+    closeEditUserModal();
+    await loadUserList();
+    await checkStatus();
+  } catch (e) { showToast('Error updating user: ' + e.message); }
+}
+
+// User Personal Profile & Password Settings
+function openProfileModal() {
+  document.getElementById('profileNameInput').value = currentUser ? (currentUser.name || '') : '';
+  document.getElementById('profileUsernameInput').value = currentUser ? (currentUser.username || '') : '';
+  document.getElementById('profileNewPasswordInput').value = '';
+  document.getElementById('profileCurrentPasswordInput').value = '';
+  document.getElementById('profileModal').classList.add('show');
+}
+
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.remove('show');
+}
+
+async function saveMyProfileChanges() {
+  const name = document.getElementById('profileNameInput').value.trim();
+  const newUsername = document.getElementById('profileUsernameInput').value.trim();
+  const newPassword = document.getElementById('profileNewPasswordInput').value.trim();
+  const currentPassword = document.getElementById('profileCurrentPasswordInput').value.trim();
+
+  if (!currentPassword && (newPassword || (currentUser && newUsername !== currentUser.username))) {
+    showToast('Current password is required to change username or password');
+    return;
+  }
+
+  showToast('Saving profile updates...');
+  try {
+    const resp = await fetch('/api/user/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        new_username: newUsername,
+        new_password: newPassword,
+        current_password: currentPassword
+      })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('Profile updated successfully!');
+    closeProfileModal();
+    await checkStatus();
+  } catch (e) { showToast('Error saving profile: ' + e.message); }
+}
+
+async function createUserAccount() {
+  const u = document.getElementById('newUsername').value.trim();
+  const p = document.getElementById('newPassword').value.trim();
+  const n = document.getElementById('newName').value.trim();
+  const r = document.getElementById('newRole').value;
+  const d = document.getElementById('newDept').value;
+
+  if (!u || !p) { showToast('Username and Password are required'); return; }
+
+  try {
+    const resp = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p, name: n, role: r, department: d })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('User "' + u + '" created with access scope: ' + d);
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('newName').value = '';
+    loadUserList();
+  } catch (e) { showToast('Error creating user: ' + e.message); }
+}
+
+async function deleteUserAccount(u) {
+  if (!confirm('Are you sure you want to delete user account "' + u + '"?')) return;
+  try {
+    const resp = await fetch('/api/users/' + encodeURIComponent(u), { method: 'DELETE' });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('User "' + u + '" deleted');
+    loadUserList();
+  } catch (e) { showToast('Error deleting user: ' + e.message); }
+}
+
+// Data Audit & Mismatch Inspector Controls
+let currentAuditData = null;
+
+async function openAuditModal() {
+  document.getElementById('auditModal').classList.add('show');
+  await refreshAuditData();
+}
+
+function closeAuditModal() {
+  document.getElementById('auditModal').classList.remove('show');
+}
+
+async function refreshAuditData() {
+  try {
+    const resp = await fetch('/api/audit?fiscal_year=' + encodeURIComponent(selectedFiscalYear));
+    const data = await resp.json();
+    currentAuditData = data;
+
+    const total = data.summary.total_issues;
+    const badge = document.getElementById('auditBadge');
+    if (total > 0) {
+      badge.textContent = total;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    document.getElementById('auditTotalIssues').textContent = data.summary.total_issues;
+    document.getElementById('auditUnmatchedTax').textContent = data.summary.unmatched_tax_pins_count;
+    document.getElementById('auditNoTax').textContent = data.summary.db_without_tax_count;
+
+    renderAuditTable(data.issues);
+  } catch (e) {
+    console.error('Audit fetch error:', e);
+  }
+}
+
+function renderAuditTable(issues) {
+  const tbody = document.getElementById('auditTableBody');
+  if (!issues || issues.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="padding:30px; text-align:center; color:#4ade80;">
+          <div style="font-size:24px; margin-bottom:6px;">✅</div>
+          <div style="font-weight:700;">No Data Integrity Issues Found!</div>
+          <div style="font-size:11px; color:#94a3b8;">All employee records and tax challans match perfectly.</div>
+        </td>
+      </tr>`;
+    return;
+  }
+
+  let html = '';
+  issues.forEach(issue => {
+    let sevBadge = '';
+    if (issue.severity === 'danger') {
+      sevBadge = '<span style="background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:12px; font-weight:700; font-size:10px;">🚨 Critical</span>';
+    } else if (issue.severity === 'warning') {
+      sevBadge = '<span style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:700; font-size:10px;">⚠️ Warning</span>';
+    } else {
+      sevBadge = '<span style="background:#e0f2fe; color:#075985; padding:2px 8px; border-radius:12px; font-weight:700; font-size:10px;">ℹ️ Info</span>';
+    }
+
+    html += `
+      <tr style="border-bottom:1px solid #334155;">
+        <td style="padding:10px 12px;">${sevBadge}</td>
+        <td style="padding:10px 12px; font-weight:700; color:#38bdf8;">${issue.pin}</td>
+        <td style="padding:10px 12px; color:#f8fafc;">${issue.name}</td>
+        <td style="padding:10px 12px; color:#94a3b8;">${issue.department}</td>
+        <td style="padding:10px 12px; color:#cbd5e1;">${issue.message}</td>
+        <td style="padding:10px 12px; text-align:center;">
+          <button class="btn btn-outline btn-sm" style="font-size:10px; padding:2px 6px; border-color:#475569;" onclick="inspectAuditPin('${issue.pin}')">View</button>
+        </td>
+      </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function filterAuditIssues(type, btn) {
+  if (btn) {
+    document.querySelectorAll('#auditFilterBar .pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (!currentAuditData) return;
+  if (type === 'all') {
+    renderAuditTable(currentAuditData.issues);
+  } else {
+    const filtered = currentAuditData.issues.filter(i => i.type === type);
+    renderAuditTable(filtered);
+  }
+}
+
+function inspectAuditPin(pin) {
+  closeAuditModal();
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.value = pin;
+    searchInput.dispatchEvent(new Event('input'));
+  }
+}
+
+// User Manual Modal Controls & Tabs
+function openManualModal() {
+  document.getElementById('manualModal').classList.add('show');
+}
+function closeManualModal() {
+  document.getElementById('manualModal').classList.remove('show');
+}
+
+function switchManualTab(tabId, btnEl) {
+  document.querySelectorAll('.manual-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.manual-tab-content').forEach(c => c.style.display = 'none');
+
+  btnEl.classList.add('active');
+  const target = document.getElementById('tab-' + tabId);
+  if (target) target.style.display = 'block';
+}
+
+// Systemic Dataset Hub JS Controls
+async function openDatasetsModal() {
+  document.getElementById('datasetsModal').classList.add('show');
+  await renderDatasetsHub();
+}
+
+function closeDatasetsModal() {
+  document.getElementById('datasetsModal').classList.remove('show');
+}
+
+async function renderDatasetsHub() {
+  const container = document.getElementById('datasetsGridContainer');
+  try {
+    const resp = await fetch('/api/datasets');
+    const data = await resp.json();
+    const datasets = data.datasets || [];
+
+    if (!datasets.length) {
+      container.innerHTML = `
+        <div style="background:#1e293b; border:1px dashed #334155; border-radius:12px; padding:36px; text-align:center; color:#94a3b8;">
+          <div style="font-size:32px; margin-bottom:8px;">📁</div>
+          <h4 style="color:#f8fafc; margin:0 0 6px;">No Datasets Found in Database</h4>
+          <p style="margin:0; font-size:12px;">Upload an Employee Salary Database or Tax Challan CSV from the left sidebar to populate SQLite storage.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    datasets.forEach(ds => {
+      const fy = ds.fiscal_year;
+      const statusBadge = ds.status === 'complete' 
+        ? '<span style="background:#065f46; color:#34d399; font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px;">✓ COMPLETE</span>'
+        : (ds.status === 'salary_only' 
+          ? '<span style="background:#1e3a8a; color:#60a5fa; font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px;">📊 SALARY ONLY</span>' 
+          : '<span style="background:#78350f; color:#fbbf24; font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px;">🧾 TAX ONLY</span>');
+
+      const dbInfo = ds.database_batch;
+      const taxInfo = ds.tax_batch;
+
+      html += `
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; font-weight:800; color:#38bdf8;">📅 Fiscal Year ${fy}</span>
+              ${statusBadge}
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-sm" style="color:#38bdf8; border-color:#334155;" onclick="changeFiscalYear('${fy}'); closeDatasetsModal();">View Data</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFiscalYearSystemic('${fy}')">Delete FY ${fy}</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px;">
+              <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px; display:flex; justify-content:space-between;">
+                <span>📊 Salary Database</span>
+                <span style="color:#38bdf8;">${ds.employee_count} Employees</span>
+              </div>
+              ${dbInfo ? `
+                <div style="font-size:12px; font-weight:700; color:#f8fafc; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📄 ${dbInfo.filename}</div>
+                <div style="font-size:10px; color:#64748b; margin-top:4px;">Uploaded by <strong style="color:#94a3b8;">@${dbInfo.uploaded_by}</strong> on ${dbInfo.created_at}</div>
+              ` : `
+                <div style="font-size:11px; color:#64748b; font-style:italic">No Salary Database CSV uploaded for FY ${fy}</div>
+              `}
+            </div>
+
+            <div style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px;">
+              <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px; display:flex; justify-content:space-between;">
+                <span>🧾 Tax Challan Records</span>
+                <span style="color:#34d399;">${ds.tax_records_count} Challans</span>
+              </div>
+              ${taxInfo ? `
+                <div style="font-size:12px; font-weight:700; color:#f8fafc; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📄 ${taxInfo.filename}</div>
+                <div style="font-size:10px; color:#64748b; margin-top:4px;">Uploaded by <strong style="color:#94a3b8;">@${taxInfo.uploaded_by}</strong> on ${taxInfo.created_at}</div>
+              ` : `
+                <div style="font-size:11px; color:#64748b; font-style:italic">No Tax Challan CSV uploaded for FY ${fy}</div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div style="color:#f87171; text-align:center; padding:20px;">Error loading datasets: ${e.message}</div>`;
+  }
+}
+
+async function deleteFiscalYearSystemic(fy) {
+  if (!confirm(`Are you sure you want to delete all employee salary and tax dataset records for Fiscal Year ${fy}?`)) return;
+  showToast(`Deleting Fiscal Year ${fy} dataset...`);
+  try {
+    const resp = await fetch(`/api/upload/database?fiscal_year=${encodeURIComponent(fy)}`, { method: 'DELETE' });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast(`FY ${fy} datasets deleted successfully`);
+    await loadFiscalYears();
+    await loadEmployees();
+    await checkStatus();
+    await renderDatasetsHub();
+  } catch (e) {
+    showToast('Failed to delete: ' + e.message);
+  }
+}
+
+async function clearAllDataSystemic() {
+  if (!confirm("⚠️ DANGER: Are you sure you want to purge and clear ALL datasets across ALL fiscal years?")) return;
+  if (!confirm("Confirming again: This will wipe all SQLite database records permanently. Proceed?")) return;
+
+  showToast('Purging all datasets...');
+  try {
+    const resp = await fetch('/api/upload/all', { method: 'DELETE' });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('All datasets purged successfully');
+    await loadFiscalYears();
+    await loadEmployees();
+    await checkStatus();
+    await renderDatasetsHub();
+  } catch (e) {
+    showToast('Failed to clear datasets: ' + e.message);
+  }
+}
+
+// Keyboard Shortcuts Handler
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAuditModal();
+    closeDatasetsModal();
+    closeManualModal();
+    closePdfModal();
+    closeUserModal();
+    closeEditUserModal();
+    closeProfileModal();
+    closeDetail();
+  }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.focus();
+  }
+});
+
+// Initialize on page load in parallel
+(async function init() {
+  await Promise.all([checkStatus(), loadEmployees(), refreshAuditData()]);
+})();
+</script>
+</body>
+</html>
