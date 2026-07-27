@@ -4,6 +4,18 @@
 
 ---
 
+## 📸 Application Screenshots
+
+### 📊 Dashboard Overview & Active Fiscal Year Hub
+![Dashboard Overview](static/screenshots/dashboard.jpg)
+
+---
+
+### 📄 In-Browser PDF Live Certificate Preview & Letterhead BG Mode
+![Tax Certificate Preview](static/screenshots/pdf_preview.jpg)
+
+---
+
 ## 🌟 Key Features
 
 - 📅 **Multi-Fiscal Year Data Hub**: Multi-tenant SQLite persistence capable of managing salary databases and tax challans per fiscal year (`2024-2025`, `2025-2026`, etc.) with zero data overwriting.
