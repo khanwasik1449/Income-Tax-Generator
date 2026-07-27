@@ -1,6 +1,6 @@
 # 📑 Tax Statement Portal
 > **Income Tax Statement & CRM System**  
-> *Official Tax Certificate Generation & Payroll Audit Platform for BRAC Institute of Educational Development (BRAC IED), BRAC University.*
+> *Official Tax Certificate Generation & Payroll Audit Platform.*
 
 ---
 
