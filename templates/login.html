@@ -255,9 +255,15 @@ body {
       <button style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;" onclick="closePublicRequestModal()">&times;</button>
     </div>
     <form onsubmit="handlePublicRequestSubmit(event)">
-      <div style="margin-bottom:12px;">
-        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Full Name *</label>
-        <input type="text" id="reqName" placeholder="Enter Full Name" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div>
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Main PIN Number *</label>
+          <input type="text" id="reqPin" placeholder="e.g. 10100" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Full Name *</label>
+          <input type="text" id="reqName" placeholder="Enter Full Name" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+        </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
         <div>
@@ -329,6 +335,7 @@ function closeTrackModal() {
 async function handlePublicRequestSubmit(e) {
   e.preventDefault();
   const payload = {
+    pin: document.getElementById('reqPin').value.trim(),
     name: document.getElementById('reqName').value.trim(),
     designation: document.getElementById('reqDesignation').value.trim(),
     tin: document.getElementById('reqTin').value.trim(),
