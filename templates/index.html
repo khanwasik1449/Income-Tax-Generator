@@ -1514,14 +1514,14 @@ function switchMainView(viewName, btn) {
   if (viewName === 'requests') {
     if (dirView) dirView.style.display = 'none';
     if (reqView) reqView.style.display = 'block';
-    if (navDir) { navDir.style.border = '1px solid #334155'; navDir.style.background = '#0f172a'; navDir.style.color = '#94a3b8'; }
-    if (navReq) { navReq.style.border = '2px solid #a855f7'; navReq.style.background = '#1e293b'; navReq.style.color = '#c084fc'; }
+    if (navDir) { navDir.style.border = '1px solid #cbd5e1'; navDir.style.background = '#ffffff'; navDir.style.color = '#475569'; }
+    if (navReq) { navReq.style.border = '2px solid #9333ea'; navReq.style.background = '#f3e8ff'; navReq.style.color = '#7e22ce'; }
     loadRequestsData();
   } else {
     if (reqView) reqView.style.display = 'none';
     if (dirView) dirView.style.display = 'block';
-    if (navReq) { navReq.style.border = '1px solid #334155'; navReq.style.background = '#0f172a'; navReq.style.color = '#c084fc'; }
-    if (navDir) { navDir.style.border = '2px solid #38bdf8'; navDir.style.background = '#1e293b'; navDir.style.color = '#38bdf8'; }
+    if (navReq) { navReq.style.border = '1px solid #cbd5e1'; navReq.style.background = '#ffffff'; navReq.style.color = '#7e22ce'; }
+    if (navDir) { navDir.style.border = '2px solid #2563eb'; navDir.style.background = '#eff6ff'; navDir.style.color = '#1d4ed8'; }
   }
 }
 
@@ -1747,13 +1747,6 @@ function renderRequestsTable(requests) {
     }
     if (r.status !== 'Completed') {
       html += '<button class="btn btn-sm" style="background:#8b5cf6; color:#fff; font-size:10px; padding:5px 10px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Completed\')">✅ Complete</button>';
-    }
-    html += '</div>';
-    html += '</td>';
-    html += '</tr>';
-  });
-  body.innerHTML = html;
-}ground:#8b5cf6; color:#fff; font-size:10px; padding:4px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Completed\')">✅ Complete</button>';
     }
     html += '</div>';
     html += '</td>';
