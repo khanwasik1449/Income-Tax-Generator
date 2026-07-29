@@ -117,6 +117,20 @@ def init_db():
         cursor.execute("""
         CREATE INDEX IF NOT EXISTS idx_batches_fy ON dataset_batches(fiscal_year);
         """)
+
+        # Seed initial sample tax requests if table is empty
+        cursor.execute("SELECT COUNT(*) FROM tax_requests;")
+        if cursor.fetchone()[0] == 0:
+            sample_reqs = [
+                ("REQ-20260729-1001", "10100", "Wasik Ahmed Khan", "Software Engineer", "123456789012", "wasik.ahmed@brac.net", "2024-2025", "Pending", "Requesting certificate for bank loan verification"),
+                ("REQ-20260729-1002", "PENDING_PIN", "Jane Smith", "Assistant Director", "987654321098", "jane.smith@brac.net", "2024-2025", "In Progress", "Needs physical signed copy"),
+                ("REQ-20260729-1003", "10101", "Md. Tanvir Hossain", "Senior Finance Officer", "456789012345", "tanvir.hossain@brac.net", "2024-2025", "Ready for Pickup", "Certificate prepared & signed")
+            ]
+            cursor.executemany("""
+                INSERT INTO tax_requests (req_id, pin, name, designation, tin, email, fiscal_year, status, remarks)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, sample_reqs)
+
         conn.commit()
 
 
