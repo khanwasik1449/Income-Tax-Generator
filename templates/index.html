@@ -307,9 +307,6 @@ tr:hover td { background: #f8fafc; }
     <button class="btn btn-outline" id="btnDatasetsHub" style="color:#38bdf8; border-color:rgba(56,189,248,0.5);" onclick="openDatasetsModal()">
       <span>📂</span> Datasets Hub
     </button>
-    <button class="btn btn-outline" id="btnTaxRequests" style="color:#c084fc; border-color:rgba(192,132,252,0.5);" onclick="openRequestsModal()">
-      <span>📥</span> Statement Requests <span id="requestsBadge" style="background:#a855f7; color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:4px;">0</span>
-    </button>
     <button class="btn btn-outline" id="btnAuditInspector" style="color:#f59e0b; border-color:rgba(245,158,11,0.5);" onclick="openAuditModal()">
       <span>🔍</span> Data Audit &amp; Inspector <span id="auditBadge" style="background:#ef4444; color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:4px; display:none;">0</span>
     </button>
@@ -362,6 +359,20 @@ tr:hover td { background: #f8fafc; }
 
 <div class="layout">
   <aside class="sidebar">
+    <!-- Portal Navigation Menu -->
+    <div class="sidebar-card" style="background:#0f172a; border:2px solid #334155; padding:14px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.2);">
+      <div class="sidebar-title" style="color:#38bdf8; font-size:11px; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;">📌 Navigation Menu</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="nav-item-btn activeNav" id="navBtnDirectory" onclick="switchMainView('directory', this)" style="display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-radius:8px; border:2px solid #38bdf8; background:#1e293b; color:#38bdf8; font-weight:800; font-size:12px; cursor:pointer; text-align:left; transition:all 0.2s ease;">
+          <span>📊 Directory &amp; Records</span>
+        </button>
+        <button class="nav-item-btn" id="navBtnRequests" onclick="switchMainView('requests', this)" style="display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#c084fc; font-weight:800; font-size:12px; cursor:pointer; text-align:left; transition:all 0.2s ease;">
+          <span>📥 Statement Requests</span>
+          <span id="sidebarReqBadge" style="background:#a855f7; color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:10px;">0</span>
+        </button>
+      </div>
+    </div>
+
     <div class="sidebar-card">
       <div class="sidebar-title">Data Upload Hub</div>
       
@@ -399,41 +410,113 @@ tr:hover td { background: #f8fafc; }
   </aside>
 
   <main class="main-content">
-    <div class="toolbar" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-      <div class="fy-select-wrap" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border:2px solid #38bdf8; padding:6px 14px; border-radius:10px; box-shadow:0 0 14px rgba(56,189,248,0.3); transition:all 0.2s ease;" title="Active Fiscal Year selector - Determines all statistics, tables, audit report, and PDF certificates">
-        <span style="color:#fbbf24; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
-          <span>📅</span> ACTIVE FISCAL YEAR:
-        </span>
-        <select id="fySelect" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; font-weight:800; font-size:13px; padding:6px 12px; cursor:pointer; outline:none; box-shadow:0 2px 6px rgba(0,0,0,0.3);" onchange="changeFiscalYear(this.value)">
-          <option value="" style="background:#0f172a; color:#fff;">Loading Years...</option>
-        </select>
+    <!-- DEDICATED WORKSPACE VIEW 1: Directory & Records -->
+    <div id="viewDirectory">
+      <div class="toolbar" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <div class="fy-select-wrap" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border:2px solid #38bdf8; padding:6px 14px; border-radius:10px; box-shadow:0 0 14px rgba(56,189,248,0.3); transition:all 0.2s ease;" title="Active Fiscal Year selector - Determines all statistics, tables, audit report, and PDF certificates">
+          <span style="color:#fbbf24; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <span>📅</span> ACTIVE FISCAL YEAR:
+          </span>
+          <select id="fySelect" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; font-weight:800; font-size:13px; padding:6px 12px; cursor:pointer; outline:none; box-shadow:0 2px 6px rgba(0,0,0,0.3);" onchange="changeFiscalYear(this.value)">
+            <option value="" style="background:#0f172a; color:#fff;">Loading Years...</option>
+          </select>
+        </div>
+        <div class="search-input-wrap" style="flex:1;">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by PIN, Gender, or TIN...">
+        </div>
+        <div class="filter-pills">
+          <div class="pill active" onclick="setFilter('all', this)">All Employees</div>
+          <div class="pill" onclick="setFilter('taxed', this)">Tax Deducted</div>
+          <div class="pill" onclick="setFilter('notax', this)">No Tax Challans</div>
+        </div>
       </div>
-      <div class="search-input-wrap" style="flex:1;">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search by PIN, Gender, or TIN...">
+
+      <!-- Active Fiscal Year Directory Header Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; margin-top:18px; padding:0 4px;">
+        <div style="font-size:15px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:10px;">
+          <span>👥 Employee Directory &amp; Tax Certificates</span>
+          <span id="activeFyBadge" style="background:#0f172a; color:#fbbf24; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; border:1px solid #38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.2);">📅 FY 2025-2026</span>
+        </div>
+        <div style="font-size:11px; color:#64748b; font-weight:600;">Displaying active fiscal year records</div>
       </div>
-      <div class="filter-pills">
-        <div class="pill active" onclick="setFilter('all', this)">All Employees</div>
-        <div class="pill" onclick="setFilter('taxed', this)">Tax Deducted</div>
-        <div class="pill" onclick="setFilter('notax', this)">No Tax Challans</div>
+
+      <div class="table-card">
+        <div class="table-wrapper" id="tableContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📁</div>
+            <h3>No Data Loaded Yet</h3>
+            <p>Upload your Employee Salary Database (CSV/Excel) from the left sidebar to get started.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Active Fiscal Year Directory Header Bar -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; margin-top:18px; padding:0 4px;">
-      <div style="font-size:15px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:10px;">
-        <span>👥 Employee Directory &amp; Tax Certificates</span>
-        <span id="activeFyBadge" style="background:#0f172a; color:#fbbf24; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; border:1px solid #38bdf8; box-shadow:0 0 8px rgba(56,189,248,0.2);">📅 FY 2025-2026</span>
-      </div>
-      <div style="font-size:11px; color:#64748b; font-weight:600;">Displaying active fiscal year records</div>
-    </div>
+    <!-- DEDICATED WORKSPACE VIEW 2: Income Tax Statement Requests Queue -->
+    <div id="viewRequests" style="display:none; padding:4px;">
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:20px; color:#e2e8f0; box-shadow:0 10px 15px -3px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:14px; margin-bottom:18px;">
+          <div>
+            <h3 style="font-size:18px; font-weight:800; color:#c084fc; margin:0; display:flex; align-items:center; gap:8px;">
+              <span>📥 Income Tax Statement Requests Queue</span>
+              <span id="requestsCountHeader" style="background:#a855f7; color:#fff; font-size:11px; font-weight:800; padding:2px 10px; border-radius:10px;">0 Pending</span>
+            </h3>
+            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Track employee requests, assign Dummy/Main PINs, prepare &amp; print physical statements, and notify users for pickup.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadRequestsData()">🔄 Refresh Queue</button>
+        </div>
 
-    <div class="table-card">
-      <div class="table-wrapper" id="tableContainer">
-        <div class="empty-state">
-          <div class="empty-icon">📁</div>
-          <h3>No Data Loaded Yet</h3>
-          <p>Upload your Employee Salary Database (CSV/Excel) from the left sidebar to get started.</p>
+        <!-- Summary KPI Cards -->
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:20px;">
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase;">TOTAL REQUESTS</div>
+            <div style="font-size:22px; font-weight:800; color:#fff; margin-top:2px;" id="reqKpiTotal">0</div>
+          </div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; color:#fbbf24; font-weight:700; text-transform:uppercase;">PENDING REVIEW</div>
+            <div style="font-size:22px; font-weight:800; color:#fbbf24; margin-top:2px;" id="reqKpiPending">0</div>
+          </div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; color:#38bdf8; font-weight:700; text-transform:uppercase;">IN PROGRESS</div>
+            <div style="font-size:22px; font-weight:800; color:#38bdf8; margin-top:2px;" id="reqKpiProgress">0</div>
+          </div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; color:#34d399; font-weight:700; text-transform:uppercase;">READY FOR PICKUP</div>
+            <div style="font-size:22px; font-weight:800; color:#34d399; margin-top:2px;" id="reqKpiReady">0</div>
+          </div>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; color:#c084fc; font-weight:700; text-transform:uppercase;">COMPLETED</div>
+            <div style="font-size:22px; font-weight:800; color:#c084fc; margin-top:2px;" id="reqKpiCompleted">0</div>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div style="display:flex; gap:8px; margin-bottom:16px; background:#1e293b; padding:10px 14px; border-radius:10px; border:1px solid #334155;">
+          <button class="btn btn-sm btn-outline activeReqFilter" onclick="filterRequestsByStatus('all', this)" style="font-size:11px;">All Requests</button>
+          <button class="btn btn-sm btn-outline activeReqFilter" onclick="filterRequestsByStatus('Pending', this)" style="font-size:11px; color:#fbbf24; border-color:rgba(251,191,36,0.4);">🟡 Pending</button>
+          <button class="btn btn-sm btn-outline activeReqFilter" onclick="filterRequestsByStatus('In Progress', this)" style="font-size:11px; color:#38bdf8; border-color:rgba(56,189,248,0.4);">🔵 In Progress</button>
+          <button class="btn btn-sm btn-outline activeReqFilter" onclick="filterRequestsByStatus('Ready for Pickup', this)" style="font-size:11px; color:#34d399; border-color:rgba(52,211,153,0.4);">🟢 Ready for Pickup</button>
+          <button class="btn btn-sm btn-outline activeReqFilter" onclick="filterRequestsByStatus('Completed', this)" style="font-size:11px; color:#c084fc; border-color:rgba(192,132,252,0.4);">✅ Completed</button>
+        </div>
+
+        <!-- Requests Table -->
+        <div style="overflow-x:auto;">
+          <table style="width:100%; font-size:12px; border-collapse:collapse; background:#1e293b; border-radius:10px; overflow:hidden; border:1px solid #334155;">
+            <thead>
+              <tr style="background:#0f172a; color:#94a3b8; text-align:left; border-bottom:1px solid #334155;">
+                <th style="padding:12px;">Req ID &amp; Date</th>
+                <th style="padding:12px;">Employee Name</th>
+                <th style="padding:12px;">Assigned PIN (Main / Dummy PIN)</th>
+                <th style="padding:12px;">Email / Designation</th>
+                <th style="padding:12px;">Fiscal Year</th>
+                <th style="padding:12px;">Status</th>
+                <th style="padding:12px; text-align:right;">HR Workflow Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTableBody">
+              <tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading requests queue...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1398,6 +1481,58 @@ function closeRequestsModal() {
   document.getElementById('requestsModal').classList.remove('show');
 }
 
+// Switch Main View (Directory vs Statement Requests Queue)
+function switchMainView(viewName, btn) {
+  const dirView = document.getElementById('viewDirectory');
+  const reqView = document.getElementById('viewRequests');
+  const navDir = document.getElementById('navBtnDirectory');
+  const navReq = document.getElementById('navBtnRequests');
+
+  if (viewName === 'requests') {
+    if (dirView) dirView.style.display = 'none';
+    if (reqView) reqView.style.display = 'block';
+    if (navDir) { navDir.style.border = '1px solid #334155'; navDir.style.background = '#0f172a'; navDir.style.color = '#94a3b8'; }
+    if (navReq) { navReq.style.border = '2px solid #a855f7'; navReq.style.background = '#1e293b'; navReq.style.color = '#c084fc'; }
+    loadRequestsData();
+  } else {
+    if (reqView) reqView.style.display = 'none';
+    if (dirView) dirView.style.display = 'block';
+    if (navReq) { navReq.style.border = '1px solid #334155'; navReq.style.background = '#0f172a'; navReq.style.color = '#c084fc'; }
+    if (navDir) { navDir.style.border = '2px solid #38bdf8'; navDir.style.background = '#1e293b'; navDir.style.color = '#38bdf8'; }
+  }
+}
+
+async function saveReqPin(reqId) {
+  const input = document.getElementById('pinInput_' + reqId);
+  if (!input) return;
+  const pinVal = input.value.trim();
+  if (!pinVal) { showToast('Please enter a valid PIN or Dummy PIN'); return; }
+
+  showToast('Assigning PIN ' + pinVal + ' to request...');
+  try {
+    const resp = await fetch('/api/request/' + encodeURIComponent(reqId) + '/pin', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: pinVal })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+    showToast('Assigned PIN ' + pinVal + ' successfully!');
+    loadRequestsData();
+  } catch (e) {
+    showToast('Failed to assign PIN: ' + e.message);
+  }
+}
+
+function editReqPin(reqId, currentPin) {
+  const container = document.getElementById('pinCol_' + reqId);
+  if (!container) return;
+  const val = (currentPin === 'PENDING_PIN' || !currentPin) ? '' : currentPin;
+  container.innerHTML = '<div style="display:flex; gap:4px; align-items:center;"><input type="text" id="pinInput_' + reqId + '" value="' + val + '" placeholder="Enter PIN / Dummy PIN" style="width:120px; padding:4px 8px; font-size:11px; background:#0f172a; color:#fff; border:1px solid #38bdf8; border-radius:6px; font-weight:700;"><button class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;" onclick="saveReqPin(\'' + reqId + '\')">💾 Save</button></div>';
+}
+
+let activeRequestFilterStatus = 'all';
+
 function filterRequestsByStatus(status, btn) {
   activeRequestFilterStatus = status;
   document.querySelectorAll('.activeReqFilter').forEach(b => b.style.fontWeight = '400');
@@ -1408,7 +1543,7 @@ function filterRequestsByStatus(status, btn) {
 async function loadRequestsData() {
   const body = document.getElementById('requestsTableBody');
   if (!body) return;
-  body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Loading requests queue...</td></tr>';
+  body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading requests queue...</td></tr>';
   try {
     const url = '/api/requests?fiscal_year=' + encodeURIComponent(selectedFiscalYear) + '&status=' + encodeURIComponent(activeRequestFilterStatus);
     const resp = await fetch(url);
@@ -1424,7 +1559,7 @@ async function loadRequestsData() {
     const elReady = document.getElementById('reqKpiReady'); if (elReady) elReady.textContent = summary.ready || 0;
     const elCompleted = document.getElementById('reqKpiCompleted'); if (elCompleted) elCompleted.textContent = summary.completed || 0;
 
-    const badge = document.getElementById('requestsBadge');
+    const badge = document.getElementById('sidebarReqBadge');
     if (badge) {
       badge.textContent = summary.pending || 0;
       badge.style.display = (summary.pending > 0) ? 'inline-block' : 'none';
@@ -1433,7 +1568,7 @@ async function loadRequestsData() {
     if (countHeader) countHeader.textContent = (summary.pending || 0) + ' Pending';
 
     if (!requests.length) {
-      body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">No statement requests found.</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">No statement requests found in queue.</td></tr>';
       return;
     }
 
@@ -1444,15 +1579,28 @@ async function loadRequestsData() {
       if (r.status === 'Ready for Pickup') stColor = '#34d399';
       if (r.status === 'Completed') stColor = '#c084fc';
 
+      const hasPin = (r.pin && r.pin !== 'PENDING_PIN');
+
       html += '<tr style="border-bottom:1px solid #334155;">';
       html += '<td style="padding:10px;"><strong style="color:#38bdf8;">' + r.req_id + '</strong><div style="font-size:10px; color:#94a3b8;">' + (r.created_at || '').substring(0, 16) + '</div></td>';
-      html += '<td style="padding:10px;"><strong style="color:#fff;">PIN: ' + r.pin + '</strong><div style="font-size:11px; color:#cbd5e1;">' + r.name + '</div></td>';
-      html += '<td style="padding:10px;"><div style="color:#94a3b8;">' + r.email + '</div><div style="font-size:10px; color:#64748b;">' + (r.designation || 'N/A') + '</div></td>';
+      html += '<td style="padding:10px;"><strong style="color:#fff; font-size:13px;">' + r.name + '</strong></td>';
+      
+      // Assigned PIN / Dummy PIN Column
+      html += '<td style="padding:10px;" id="pinCol_' + r.req_id + '">';
+      if (hasPin) {
+        html += '<span style="background:#0f172a; border:1px solid #38bdf8; padding:3px 10px; border-radius:6px; font-weight:800; color:#fbbf24; font-size:12px;">PIN: ' + r.pin + '</span>';
+        html += '<button class="btn btn-outline btn-sm" style="font-size:9px; padding:2px 6px; color:#94a3b8; border-color:#475569; margin-left:6px;" onclick="editReqPin(\'' + r.req_id + '\', \'' + r.pin + '\')" title="Edit assigned PIN">✏️ Edit</button>';
+      } else {
+        html += '<div style="display:flex; gap:4px; align-items:center;"><input type="text" id="pinInput_' + r.req_id + '" placeholder="Enter PIN / Dummy PIN" style="width:130px; padding:4px 8px; font-size:11px; background:#0f172a; color:#fff; border:1px solid #38bdf8; border-radius:6px; font-weight:700;"><button class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;" onclick="saveReqPin(\'' + r.req_id + '\')">💾 Save</button></div>';
+      }
+      html += '</td>';
+
+      html += '<td style="padding:10px;"><div style="color:#38bdf8; font-weight:600;">' + r.email + '</div><div style="font-size:10px; color:#94a3b8;">' + (r.designation || 'N/A') + '</div></td>';
       html += '<td style="padding:10px;"><span style="background:#0f172a; border:1px solid #334155; padding:2px 8px; border-radius:6px; font-weight:700; color:#fbbf24;">FY ' + r.fiscal_year + '</span></td>';
       html += '<td style="padding:10px;"><span style="background:' + stColor + '; color:#0f172a; font-weight:800; padding:3px 10px; border-radius:10px; font-size:11px;">' + r.status + '</span></td>';
       html += '<td style="padding:10px; text-align:right;">';
       html += '<div style="display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap;">';
-      html += '<button class="btn btn-outline btn-sm" style="color:#38bdf8; border-color:rgba(56,189,248,0.4); font-size:10px; padding:3px 8px;" onclick="processRequestAndPrint(\'' + r.req_id + '\', \'' + r.pin + '\', \'' + r.fiscal_year + '\')" title="Generate & Print PDF Statement">📄 Print PDF</button>';
+      html += '<button class="btn btn-outline btn-sm" style="color:#38bdf8; border-color:rgba(56,189,248,0.4); font-size:10px; padding:3px 8px;" onclick="processRequestAndPrint(\'' + r.req_id + '\', \'' + (r.pin || '') + '\', \'' + r.fiscal_year + '\')" title="Generate & Print PDF Statement">📄 Prepare &amp; Print PDF</button>';
       if (r.status !== 'Ready for Pickup' && r.status !== 'Completed') {
         html += '<button class="btn btn-sm" style="background:#10b981; color:#fff; font-size:10px; padding:3px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Ready for Pickup\')" title="Notify Employee that Statement is Ready for Pickup">📧 Notify Ready</button>';
       }
@@ -1487,8 +1635,11 @@ async function updateReqStatus(reqId, newStatus) {
 }
 
 function processRequestAndPrint(reqId, pin, fiscalYear) {
+  if (!pin || pin === 'PENDING_PIN') {
+    alert('⚠️ Please enter and save a Main PIN or Dummy PIN for this request first before generating the PDF statement.');
+    return;
+  }
   updateReqStatus(reqId, 'In Progress');
-  closeRequestsModal();
   if (fiscalYear && selectedFiscalYear !== fiscalYear) {
     changeFiscalYear(fiscalYear);
   }

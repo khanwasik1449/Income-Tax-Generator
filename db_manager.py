@@ -415,15 +415,25 @@ def update_employee_tin(pin: str, fiscal_year: Optional[str] = None, new_tin: Op
         return cursor.rowcount > 0
 
 
-def create_tax_request(pin: str, name: str, designation: str, tin: str, email: str, fiscal_year: str, remarks: Optional[str] = None) -> dict:
+def create_tax_request(name: str, email: str, fiscal_year: str, designation: Optional[str] = None, tin: Optional[str] = None, remarks: Optional[str] = None, pin: Optional[str] = None) -> dict:
     init_db()
     req_id = f"REQ-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    assigned_pin = (pin or 'PENDING_PIN').strip()
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO tax_requests (req_id, pin, name, designation, tin, email, fiscal_year, remarks, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
-        """, (req_id, pin.strip(), name.strip(), (designation or '').strip(), (tin or '').strip(), email.strip().lower(), fiscal_year.strip(), (remarks or '').strip()))
+        """, (req_id, assigned_pin, name.strip(), (designation or '').strip(), (tin or '').strip(), email.strip().lower(), fiscal_year.strip(), (remarks or '').strip()))
+        conn.commit()
+    return get_tax_request_by_req_id(req_id)
+
+
+def update_tax_request_pin(req_id: str, pin: str) -> Optional[dict]:
+    init_db()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE tax_requests SET pin = ?, updated_at = CURRENT_TIMESTAMP WHERE req_id = ?", (pin.strip(), req_id.strip()))
         conn.commit()
     return get_tax_request_by_req_id(req_id)
 

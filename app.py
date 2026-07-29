@@ -23,7 +23,8 @@ from db_manager import (
     load_employees, load_tax_records, get_fiscal_years,
     get_all_dataset_batches, delete_batch, update_employee_tin,
     delete_fiscal_year, clear_all_data, get_connection,
-    create_tax_request, get_tax_requests, get_tax_request_by_req_id, update_tax_request_status
+    create_tax_request, get_tax_requests, get_tax_request_by_req_id, update_tax_request_status,
+    update_tax_request_pin
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -1088,31 +1089,18 @@ def _send_email(to_email: str, subject: str, body_text: str) -> bool:
 @app.route("/api/request-statement", methods=["POST"])
 def submit_tax_request():
     data = request.get_json() or {}
-    pin = data.get("pin", "").strip()
     name = data.get("name", "").strip()
     designation = data.get("designation", "").strip()
     tin = data.get("tin", "").strip()
     email = data.get("email", "").strip().lower()
     fiscal_year = data.get("fiscal_year", "").strip() or "2025-2026"
     remarks = data.get("remarks", "").strip()
+    pin = data.get("pin", "").strip()
 
-    if not pin or not name or not email:
-        return jsonify({"error": "Employee PIN, Full Name, and Email Address are required"}), 400
+    if not name or not email:
+        return jsonify({"error": "Full Name and Notification Email Address are required"}), 400
 
-    emp = None
-    try:
-        db, _, _, _ = _get_stores(fiscal_year)
-        emp = db.get(pin)
-    except Exception:
-        pass
-
-    if emp:
-        if not designation and getattr(emp, 'designation', None):
-            designation = emp.designation
-        if not tin and getattr(emp, 'tin', None):
-            tin = emp.tin
-
-    req = create_tax_request(pin, name, designation, tin, email, fiscal_year, remarks)
+    req = create_tax_request(name=name, email=email, fiscal_year=fiscal_year, designation=designation, tin=tin, remarks=remarks, pin=pin)
     
     subject = f"[BRAC IED] Income Tax Certificate Request Received ({req['req_id']})"
     body = (
@@ -1120,15 +1108,30 @@ def submit_tax_request():
         f"Your request for Income Tax Statement for Financial Year {fiscal_year} has been received by HR.\n\n"
         f"Request Details:\n"
         f"- Request ID: {req['req_id']}\n"
-        f"- PIN Number: {pin}\n"
         f"- Designation: {designation or 'N/A'}\n"
-        f"- Status: Pending HR Review\n\n"
+        f"- Status: Pending HR Review & PIN Assignment\n\n"
         f"You will receive another email notification when your statement is prepared, printed, and ready for pickup at HR.\n\n"
         f"Regards,\nBRAC Institute of Educational Development (BRAC IED)"
     )
     _send_email(email, subject, body)
 
     return jsonify({"success": True, "request": req, "message": f"Request submitted successfully! Tracking ID: {req['req_id']}"})
+
+
+@app.route("/api/request/<req_id>/pin", methods=["PUT"])
+@login_required
+def assign_request_pin_api(req_id):
+    data = request.get_json() or {}
+    pin = data.get("pin", "").strip()
+
+    if not pin:
+        return jsonify({"error": "PIN Number is required"}), 400
+
+    req = update_tax_request_pin(req_id, pin)
+    if not req:
+        return jsonify({"error": "Request not found"}), 404
+
+    return jsonify({"success": True, "request": req, "message": f"Assigned PIN '{pin}' to request '{req_id}'"})
 
 
 @app.route("/api/request-statement/track/<path:query>")
