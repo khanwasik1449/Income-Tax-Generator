@@ -93,6 +93,27 @@ def init_db():
         cursor.execute("""
         CREATE INDEX IF NOT EXISTS idx_tax_pin ON tax_records(pin);
         """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tax_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            req_id TEXT UNIQUE NOT NULL,
+            pin TEXT NOT NULL,
+            name TEXT NOT NULL,
+            designation TEXT,
+            tin TEXT,
+            email TEXT NOT NULL,
+            fiscal_year TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'Pending',
+            remarks TEXT,
+            hr_notes TEXT,
+            prepared_by TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_req_pin ON tax_requests(pin);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_req_status ON tax_requests(status);")
         cursor.execute("""
         CREATE INDEX IF NOT EXISTS idx_batches_fy ON dataset_batches(fiscal_year);
         """)
@@ -392,3 +413,64 @@ def update_employee_tin(pin: str, fiscal_year: Optional[str] = None, new_tin: Op
         cursor.execute(sql, params)
         conn.commit()
         return cursor.rowcount > 0
+
+
+def create_tax_request(pin: str, name: str, designation: str, tin: str, email: str, fiscal_year: str, remarks: Optional[str] = None) -> dict:
+    init_db()
+    req_id = f"REQ-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO tax_requests (req_id, pin, name, designation, tin, email, fiscal_year, remarks, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
+        """, (req_id, pin.strip(), name.strip(), (designation or '').strip(), (tin or '').strip(), email.strip().lower(), fiscal_year.strip(), (remarks or '').strip()))
+        conn.commit()
+    return get_tax_request_by_req_id(req_id)
+
+
+def get_tax_requests(fiscal_year: Optional[str] = None, status: Optional[str] = None) -> List[dict]:
+    init_db()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        query = "SELECT * FROM tax_requests"
+        conditions = []
+        params = []
+        if fiscal_year and fiscal_year.lower() != 'all':
+            conditions.append("fiscal_year = ?")
+            params.append(fiscal_year.strip())
+        if status and status.lower() != 'all':
+            conditions.append("status = ?")
+            params.append(status.strip())
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY created_at DESC"
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_tax_request_by_req_id(req_id: str) -> Optional[dict]:
+    init_db()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tax_requests WHERE req_id = ? OR pin = ? ORDER BY created_at DESC LIMIT 1", (req_id.strip(), req_id.strip()))
+        row = cursor.fetchone()
+        return dict(row) if row else None
+
+
+def update_tax_request_status(req_id: str, status: str, hr_notes: Optional[str] = None, prepared_by: Optional[str] = None) -> Optional[dict]:
+    init_db()
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        updates = ["status = ?", "updated_at = CURRENT_TIMESTAMP"]
+        params = [status.strip()]
+        if hr_notes is not None:
+            updates.append("hr_notes = ?")
+            params.append(hr_notes.strip())
+        if prepared_by is not None:
+            updates.append("prepared_by = ?")
+            params.append(prepared_by.strip())
+        params.append(req_id.strip())
+        cursor.execute(f"UPDATE tax_requests SET {', '.join(updates)} WHERE req_id = ?", params)
+        conn.commit()
+    return get_tax_request_by_req_id(req_id)

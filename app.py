@@ -4,6 +4,9 @@ import json
 import uuid
 import traceback
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from functools import wraps
 from flask import Flask, request, render_template, send_file, jsonify, send_from_directory, session, redirect, url_for
@@ -19,7 +22,8 @@ from db_manager import (
     init_db, save_employees, save_tax_records,
     load_employees, load_tax_records, get_fiscal_years,
     get_all_dataset_batches, delete_batch, update_employee_tin,
-    delete_fiscal_year, clear_all_data, get_connection
+    delete_fiscal_year, clear_all_data, get_connection,
+    create_tax_request, get_tax_requests, get_tax_request_by_req_id, update_tax_request_status
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -1036,6 +1040,197 @@ def download_all(batch_id):
     buf.seek(0)
     return send_file(buf, mimetype="application/zip",
                      as_attachment=True, download_name=f"IncomeTax_{batch_id}.zip")
+
+
+SMTP_CONFIG_PATH = os.path.join(DATA_DIR, "smtp.json")
+
+def _load_smtp_config():
+    if os.path.exists(SMTP_CONFIG_PATH):
+        try:
+            with open(SMTP_CONFIG_PATH) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def _send_email(to_email: str, subject: str, body_text: str) -> bool:
+    config = _load_smtp_config()
+    smtp_server = config.get("smtp_server")
+    smtp_port = int(config.get("smtp_port", 587))
+    smtp_user = config.get("smtp_user")
+    smtp_password = config.get("smtp_password")
+    sender_email = config.get("sender_email", smtp_user or "noreply@bracied.edu.bd")
+
+    if not smtp_server or not smtp_user:
+        log.info(f"[SIMULATED EMAIL NOTIFICATION] To: {to_email} | Subject: {subject}\n{body_text}")
+        return True
+
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = sender_email
+        msg["To"] = to_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body_text, "plain"))
+
+        server = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
+        server.starttls()
+        if smtp_password:
+            server.login(smtp_user, smtp_password)
+        server.sendmail(sender_email, [to_email], msg.as_string())
+        server.quit()
+        log.info(f"Email sent successfully to {to_email}")
+        return True
+    except Exception as e:
+        log.error(f"Failed to send email to {to_email}: {e}")
+        return False
+
+
+@app.route("/api/request-statement", methods=["POST"])
+def submit_tax_request():
+    data = request.get_json() or {}
+    pin = data.get("pin", "").strip()
+    name = data.get("name", "").strip()
+    designation = data.get("designation", "").strip()
+    tin = data.get("tin", "").strip()
+    email = data.get("email", "").strip().lower()
+    fiscal_year = data.get("fiscal_year", "").strip() or "2025-2026"
+    remarks = data.get("remarks", "").strip()
+
+    if not pin or not name or not email:
+        return jsonify({"error": "Employee PIN, Full Name, and Email Address are required"}), 400
+
+    emp = None
+    try:
+        db, _, _, _ = _get_stores(fiscal_year)
+        emp = db.get(pin)
+    except Exception:
+        pass
+
+    if emp:
+        if not designation and getattr(emp, 'designation', None):
+            designation = emp.designation
+        if not tin and getattr(emp, 'tin', None):
+            tin = emp.tin
+
+    req = create_tax_request(pin, name, designation, tin, email, fiscal_year, remarks)
+    
+    subject = f"[BRAC IED] Income Tax Certificate Request Received ({req['req_id']})"
+    body = (
+        f"Dear {name},\n\n"
+        f"Your request for Income Tax Statement for Financial Year {fiscal_year} has been received by HR.\n\n"
+        f"Request Details:\n"
+        f"- Request ID: {req['req_id']}\n"
+        f"- PIN Number: {pin}\n"
+        f"- Designation: {designation or 'N/A'}\n"
+        f"- Status: Pending HR Review\n\n"
+        f"You will receive another email notification when your statement is prepared, printed, and ready for pickup at HR.\n\n"
+        f"Regards,\nBRAC Institute of Educational Development (BRAC IED)"
+    )
+    _send_email(email, subject, body)
+
+    return jsonify({"success": True, "request": req, "message": f"Request submitted successfully! Tracking ID: {req['req_id']}"})
+
+
+@app.route("/api/request-statement/track/<path:query>")
+def track_tax_request(query):
+    req = get_tax_request_by_req_id(query)
+    if not req:
+        return jsonify({"error": "Request not found for specified ID or PIN"}), 404
+    return jsonify({"request": req})
+
+
+@app.route("/api/requests")
+@login_required
+def list_tax_requests():
+    fy = request.args.get("fiscal_year")
+    st = request.args.get("status")
+    requests_list = get_tax_requests(fiscal_year=fy, status=st)
+
+    all_reqs = get_tax_requests(fiscal_year=fy)
+    summary = {
+        "total": len(all_reqs),
+        "pending": sum(1 for r in all_reqs if r["status"] == "Pending"),
+        "in_progress": sum(1 for r in all_reqs if r["status"] in ("In Progress", "Preparing")),
+        "printed": sum(1 for r in all_reqs if r["status"] in ("Printed", "Statement Prepared")),
+        "ready": sum(1 for r in all_reqs if r["status"] == "Ready for Pickup"),
+        "completed": sum(1 for r in all_reqs if r["status"] == "Completed"),
+    }
+    return jsonify({"requests": requests_list, "summary": summary})
+
+
+@app.route("/api/request/<req_id>/status", methods=["PUT"])
+@login_required
+def update_request_status_api(req_id):
+    data = request.get_json() or {}
+    new_status = data.get("status", "").strip()
+    hr_notes = data.get("hr_notes", "").strip()
+    notify_email = data.get("notify_email", True)
+
+    user = session.get("user", {})
+    prepared_by = user.get("name") or user.get("username") or "HR Admin"
+
+    if not new_status:
+        return jsonify({"error": "Status is required"}), 400
+
+    req = update_tax_request_status(req_id, new_status, hr_notes=hr_notes, prepared_by=prepared_by)
+    if not req:
+        return jsonify({"error": "Request not found"}), 404
+
+    if notify_email or new_status == "Ready for Pickup":
+        if new_status == "Ready for Pickup":
+            subject = f"[BRAC IED] Your Income Tax Statement for FY {req['fiscal_year']} is READY FOR PICKUP!"
+            body = (
+                f"Dear {req['name']},\n\n"
+                f"Great news! Your Income Tax Certificate Statement for Financial Year {req['fiscal_year']} (PIN: {req['pin']}) "
+                f"has been prepared, printed, and verified by HR.\n\n"
+                f"Pickup Location: HR Department, BRAC Institute of Educational Development\n"
+                f"Tracking ID: {req['req_id']}\n"
+                f"Status: Ready for Pickup\n\n"
+                f"Please visit the HR office to collect your physical signed copy.\n\n"
+                f"Regards,\nHR & Payroll Team\nBRAC Institute of Educational Development (BRAC IED)"
+            )
+        elif new_status in ("In Progress", "Preparing"):
+            subject = f"[BRAC IED] HR is Preparing Your Income Tax Statement ({req['req_id']})"
+            body = (
+                f"Dear {req['name']},\n\n"
+                f"HR is currently preparing your Income Tax Certificate Statement for FY {req['fiscal_year']} (PIN: {req['pin']}).\n"
+                f"Status: In Progress / Preparing\n\n"
+                f"You will receive an update as soon as the physical statement is printed and ready.\n\n"
+                f"Regards,\nBRAC IED HR Team"
+            )
+        elif new_status == "Completed":
+            subject = f"[BRAC IED] Income Tax Statement Request Completed ({req['req_id']})"
+            body = (
+                f"Dear {req['name']},\n\n"
+                f"Your request for Income Tax Statement for FY {req['fiscal_year']} (PIN: {req['pin']}) has been marked as COMPLETED.\n"
+                f"Thank you!\n\n"
+                f"Regards,\nBRAC IED HR Team"
+            )
+        else:
+            subject = f"[BRAC IED] Status Update on Tax Statement Request ({req['req_id']})"
+            body = (
+                f"Dear {req['name']},\n\n"
+                f"The status of your Income Tax Statement Request ({req['req_id']}) has been updated to: {new_status}.\n"
+                f"Notes: {hr_notes or 'None'}\n\n"
+                f"Regards,\nBRAC IED HR Team"
+            )
+        _send_email(req['email'], subject, body)
+
+    return jsonify({"success": True, "request": req, "message": f"Status updated to '{new_status}'"})
+
+
+@app.route("/api/settings/smtp", methods=["GET", "POST"])
+@login_required
+def manage_smtp_settings():
+    if request.method == "POST":
+        data = request.get_json() or {}
+        with open(SMTP_CONFIG_PATH, "w") as f:
+            json.dump(data, f, indent=2)
+        return jsonify({"success": True, "message": "SMTP settings saved successfully"})
+    else:
+        config = _load_smtp_config()
+        config["smtp_password"] = "******" if config.get("smtp_password") else ""
+        return jsonify({"config": config})
 
 
 _seed_db_if_empty()
