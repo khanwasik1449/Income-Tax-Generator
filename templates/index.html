@@ -720,6 +720,43 @@ tr:hover td { background: #f8fafc; }
   </div>
 </div>
 
+<!-- HR Prepare & Assign PIN Popup Modal -->
+<div class="modal-overlay" id="preparePinModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:300; align-items:center; justify-content:center;">
+  <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; width:520px; max-width:92%; padding:24px; color:#e2e8f0; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:16px;">
+      <div>
+        <h3 style="color:#38bdf8; font-size:16px; margin:0; font-weight:700;">📄 Prepare Statement &amp; Assign PIN</h3>
+        <div style="font-size:12px; color:#fbbf24; font-weight:600; margin-top:2px;" id="prepModalEmpInfo">Employee: Wasik Ahmed Khan</div>
+      </div>
+      <button style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;" onclick="closePreparePinModal()">&times;</button>
+    </div>
+    
+    <form onsubmit="handlePreparePinSubmit(event)">
+      <input type="hidden" id="prepReqId">
+      <input type="hidden" id="prepFiscalYear">
+      
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:6px;">Main PIN or Dummy PIN *</label>
+        <input type="text" id="prepPinInput" oninput="searchDirectoryPinsForMatch()" placeholder="Type PIN (e.g. 10100) or Dummy PIN (e.g. DP-9001)..." required style="width:100%; padding:10px 14px; border:2px solid #38bdf8; background:#1e293b; color:#fff; border-radius:8px; font-size:14px; font-weight:800;">
+        <div style="font-size:10px; color:#64748b; margin-top:4px;">Type a PIN to find existing directory records or enter a custom Dummy PIN.</div>
+      </div>
+
+      <!-- Live Directory Matches Container -->
+      <div style="margin-bottom:16px;">
+        <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#38bdf8; margin-bottom:6px;">🔍 Matching Directory Employees:</div>
+        <div id="prepDirectoryMatchList" style="max-height:160px; overflow-y:auto; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:6px;">
+          <div style="text-align:center; padding:10px; font-size:11px; color:#64748b;">Type a PIN or name to search directory...</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; border-top:1px solid #334155; padding-top:14px;">
+        <button type="button" class="btn btn-outline" style="border-color:#475569; color:#cbd5e1;" onclick="closePreparePinModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:#2563eb; font-weight:700;">📄 Save PIN &amp; Preview Statement</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Systemic Dataset Hub Modal -->
 <div class="modal-overlay" id="datasetsModal">
   <div class="modal-box" style="width:840px;">
@@ -1571,12 +1608,113 @@ function filterRequestsListLocal() {
   renderRequestsTable(filtered);
 }
 
+let currentPrepRequest = null;
+
+function openPreparePinModal(reqId, empName, currentPin, fiscalYear) {
+  currentPrepRequest = { reqId, empName, currentPin, fiscalYear };
+  document.getElementById('prepReqId').value = reqId;
+  document.getElementById('prepFiscalYear').value = fiscalYear;
+  document.getElementById('prepModalEmpInfo').textContent = 'Employee: ' + empName + ' (FY ' + fiscalYear + ')';
+  
+  const pinInput = document.getElementById('prepPinInput');
+  const val = (currentPin === 'PENDING_PIN' || !currentPin) ? '' : currentPin;
+  pinInput.value = val;
+  
+  document.getElementById('preparePinModal').style.display = 'flex';
+  searchDirectoryPinsForMatch();
+}
+
+function closePreparePinModal() {
+  document.getElementById('preparePinModal').style.display = 'none';
+  currentPrepRequest = null;
+}
+
+function selectPrepMatchPin(pin) {
+  document.getElementById('prepPinInput').value = pin;
+  searchDirectoryPinsForMatch();
+}
+
+function searchDirectoryPinsForMatch() {
+  const container = document.getElementById('prepDirectoryMatchList');
+  if (!container) return;
+
+  const q = (document.getElementById('prepPinInput').value || '').toLowerCase().trim();
+  const empNameQuery = (currentPrepRequest ? currentPrepRequest.empName : '').toLowerCase().trim();
+
+  // Search in global employees array loaded in memory
+  let matches = [];
+  if (typeof employees !== 'undefined' && employees.length) {
+    matches = employees.filter(e => {
+      const matchPin = (e.pin || '').toLowerCase().includes(q);
+      const matchName = q ? (e.name || '').toLowerCase().includes(q) : (e.name || '').toLowerCase().includes(empNameQuery);
+      return matchPin || matchName;
+    });
+  }
+
+  if (!matches.length) {
+    container.innerHTML = '<div style="text-align:center; padding:10px; font-size:11px; color:#64748b;">No directory employee matches found for "' + (q || empNameQuery) + '". You can assign a custom Dummy PIN (e.g. DP-9001).</div>';
+    return;
+  }
+
+  let html = '';
+  matches.slice(0, 8).forEach(e => {
+    html += '<div onclick="selectPrepMatchPin(\'' + e.pin + '\')" style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid #334155; cursor:pointer; background:#0f172a; border-radius:6px; margin-bottom:4px;" title="Click to select this PIN">';
+    html += '<div><strong style="color:#fbbf24; font-size:12px;">PIN: ' + e.pin + '</strong> <span style="color:#fff; font-size:12px; margin-left:6px;">' + (e.name || '') + '</span></div>';
+    html += '<span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.1); padding:2px 6px; border-radius:4px;">' + (e.department || 'Select') + '</span>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+async function handlePreparePinSubmit(e) {
+  e.preventDefault();
+  const reqId = document.getElementById('prepReqId').value;
+  const fiscalYear = document.getElementById('prepFiscalYear').value;
+  const assignedPin = document.getElementById('prepPinInput').value.trim();
+
+  if (!assignedPin) {
+    showToast('Please enter or select a valid PIN or Dummy PIN');
+    return;
+  }
+
+  showToast('Assigning PIN ' + assignedPin + ' & opening PDF preview...');
+
+  try {
+    // 1. Assign PIN
+    const resp = await fetch('/api/request/' + encodeURIComponent(reqId) + '/pin', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: assignedPin })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Error: ' + data.error); return; }
+
+    // 2. Update Status to In Progress
+    await fetch('/api/request/' + encodeURIComponent(reqId) + '/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'In Progress' })
+    });
+
+    closePreparePinModal();
+    loadRequestsData();
+
+    // 3. Switch Fiscal Year if needed & Open PDF Live Preview Modal
+    if (fiscalYear && selectedFiscalYear !== fiscalYear) {
+      changeFiscalYear(fiscalYear);
+    }
+    openPdfPreview(assignedPin);
+  } catch (err) {
+    showToast('Failed to prepare statement: ' + err.message);
+  }
+}
+
 function renderRequestsTable(requests) {
   const body = document.getElementById('requestsTableBody');
   if (!body) return;
 
   if (!requests || !requests.length) {
-    body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">No matching statement requests found in queue.</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">No matching statement requests found in queue.</td></tr>';
     return;
   }
 
@@ -1591,15 +1729,14 @@ function renderRequestsTable(requests) {
 
     html += '<tr style="border-bottom:1px solid #334155;">';
     html += '<td style="padding:10px;"><strong style="color:#38bdf8; font-size:12px;">' + r.req_id + '</strong><div style="font-size:10px; color:#94a3b8;">' + (r.created_at || '').substring(0, 16) + '</div></td>';
-    html += '<td style="padding:10px;"><strong style="color:#fff; font-size:13px;">' + r.name + '</strong></td>';
     
-    // Assigned PIN / Dummy PIN Column
-    html += '<td style="padding:10px;" id="pinCol_' + r.req_id + '">';
+    // Employee Name & Assigned PIN
+    html += '<td style="padding:10px;">';
+    html += '<div style="font-weight:700; color:#fff; font-size:13px;">' + r.name + '</div>';
     if (hasPin) {
-      html += '<span style="background:#0f172a; border:1px solid #38bdf8; padding:4px 10px; border-radius:6px; font-weight:800; color:#fbbf24; font-size:12px;">PIN: ' + r.pin + '</span>';
-      html += '<button class="btn btn-outline btn-sm" style="font-size:9px; padding:2px 6px; color:#94a3b8; border-color:#475569; margin-left:6px;" onclick="editReqPin(\'' + r.req_id + '\', \'' + r.pin + '\')" title="Edit assigned PIN">✏️ Edit</button>';
+      html += '<span style="background:#0f172a; border:1px solid #38bdf8; padding:2px 8px; border-radius:6px; font-weight:800; color:#fbbf24; font-size:11px; margin-top:2px; display:inline-block;">PIN: ' + r.pin + '</span>';
     } else {
-      html += '<div style="display:flex; gap:4px; align-items:center;"><input type="text" id="pinInput_' + r.req_id + '" placeholder="Enter PIN / Dummy PIN" style="width:130px; padding:4px 8px; font-size:11px; background:#0f172a; color:#fff; border:1px solid #38bdf8; border-radius:6px; font-weight:700;"><button class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;" onclick="saveReqPin(\'' + r.req_id + '\')">💾 Save</button></div>';
+      html += '<span style="background:#334155; color:#94a3b8; padding:2px 6px; border-radius:6px; font-size:10px; margin-top:2px; display:inline-block;">PIN Pending</span>';
     }
     html += '</td>';
 
@@ -1617,14 +1754,16 @@ function renderRequestsTable(requests) {
     html += '</td>';
 
     // HR Actions
+    const safeName = r.name.replace(/'/g, "\\'");
+    const pinVal = (r.pin || '');
     html += '<td style="padding:10px; text-align:right;">';
     html += '<div style="display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap;">';
-    html += '<button class="btn btn-outline btn-sm" style="color:#38bdf8; border-color:rgba(56,189,248,0.4); font-size:10px; padding:3px 8px;" onclick="processRequestAndPrint(\'' + r.req_id + '\', \'' + (r.pin || '') + '\', \'' + r.fiscal_year + '\')" title="Generate & Print PDF Statement">📄 Prepare &amp; Print PDF</button>';
+    html += '<button class="btn btn-primary btn-sm" style="background:#2563eb; font-size:11px; padding:4px 10px; font-weight:700;" onclick="openPreparePinModal(\'' + r.req_id + '\', \'' + safeName + '\', \'' + pinVal + '\', \'' + r.fiscal_year + '\')" title="Assign PIN & Prepare Statement">📄 Prepare &amp; Print PDF</button>';
     if (r.status !== 'Ready for Pickup' && r.status !== 'Completed') {
-      html += '<button class="btn btn-sm" style="background:#10b981; color:#fff; font-size:10px; padding:3px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Ready for Pickup\')" title="Notify Employee that Statement is Ready for Pickup">📧 Notify Ready</button>';
+      html += '<button class="btn btn-sm" style="background:#10b981; color:#fff; font-size:10px; padding:4px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Ready for Pickup\')" title="Notify Employee that Statement is Ready for Pickup">📧 Notify Ready</button>';
     }
     if (r.status !== 'Completed') {
-      html += '<button class="btn btn-sm" style="background:#8b5cf6; color:#fff; font-size:10px; padding:3px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Completed\')">✅ Complete</button>';
+      html += '<button class="btn btn-sm" style="background:#8b5cf6; color:#fff; font-size:10px; padding:4px 8px; font-weight:700;" onclick="updateReqStatus(\'' + r.req_id + '\', \'Completed\')">✅ Complete</button>';
     }
     html += '</div>';
     html += '</td>';
