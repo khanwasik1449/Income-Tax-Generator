@@ -24,23 +24,22 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', -apple-system, sans-serif; }
 
 body {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  color: #fff;
+  color: #0f172a;
 }
 
 .login-container {
   width: 100%;
   max-width: 440px;
-  background: rgba(30, 41, 59, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--dark-border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   padding: 36px 32px;
   animation: fadeIn 0.4s ease;
 }
@@ -58,7 +57,7 @@ body {
 .brand-logo {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   border-radius: 14px;
   display: inline-flex;
   align-items: center;
@@ -66,7 +65,7 @@ body {
   font-weight: 800;
   font-size: 24px;
   color: #fff;
-  box-shadow: 0 8px 20px rgba(37,99,235,0.4);
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
   margin-bottom: 12px;
 }
 
@@ -75,17 +74,18 @@ body {
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-bottom: 4px;
+  color: #0f172a;
 }
 
 .brand-header p {
   font-size: 13px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .dept-presets {
   margin-bottom: 24px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--dark-border);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px;
 }
@@ -95,7 +95,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 8px;
 }
 
@@ -106,9 +106,9 @@ body {
 }
 
 .preset-btn {
-  background: #334155;
-  border: 1px solid transparent;
-  color: #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
   padding: 8px 10px;
   border-radius: 8px;
   font-size: 11px;
@@ -120,13 +120,13 @@ body {
   flex-direction: column;
 }
 .preset-btn:hover {
-  background: #475569;
-  border-color: #3b82f6;
-  color: #fff;
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
 }
 .preset-btn .preset-dept {
   font-size: 10px;
-  color: #94a3b8;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -138,7 +138,7 @@ body {
   display: block;
   font-size: 12px;
   font-weight: 700;
-  color: #cbd5e1;
+  color: #475569;
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -150,9 +150,9 @@ body {
 
 .form-group input {
   width: 100%;
-  background: #0f172a;
-  border: 1px solid var(--dark-border);
-  color: #fff;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
   padding: 12px 14px;
   border-radius: 10px;
   font-size: 14px;
@@ -166,9 +166,9 @@ body {
 }
 
 .alert-error {
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 13px;
@@ -188,7 +188,7 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  box-shadow: 0 4px 14px rgba(37,99,235,0.3);
   margin-top: 6px;
 }
 
@@ -198,10 +198,11 @@ body {
 }
 
 .footer-note {
-  text-align: center;
   font-size: 11px;
   color: #64748b;
-  margin-top: 24px;
+  text-align: center;
+  margin-top: 20px;
+  line-height: 1.5;
 }
 </style>
 </head>
@@ -214,7 +215,28 @@ body {
     <p>Income Tax Statement &amp; CRM System</p>
   </div>
 
-
+  <!-- Quick Department Login Shortcuts -->
+  <div class="dept-presets">
+    <div class="dept-presets-title">⚡ Quick Department Sign-In</div>
+    <div class="preset-grid">
+      <button type="button" class="preset-btn" onclick="fillLogin('admin', 'admin123')">
+        <span>👑 Super Admin</span>
+        <span class="preset-dept">Full System Access</span>
+      </button>
+      <button type="button" class="preset-btn" onclick="fillLogin('hr_manager', 'hr123')">
+        <span>💼 HR &amp; Payroll</span>
+        <span class="preset-dept">Human Resources</span>
+      </button>
+      <button type="button" class="preset-btn" onclick="fillLogin('finance_user', 'fin123')">
+        <span>📊 Finance Dept</span>
+        <span class="preset-dept">Accounts &amp; Audit</span>
+      </button>
+      <button type="button" class="preset-btn" onclick="fillLogin('audit_inspector', 'audit123')">
+        <span>🔍 Tax Auditor</span>
+        <span class="preset-dept">Compliance Scope</span>
+      </button>
+    </div>
+  </div>
 
   <div class="alert-error" id="errorAlert"></div>
 
@@ -232,56 +254,56 @@ body {
     <button type="submit" class="submit-btn">Sign In to Department</button>
   </form>
 
-  <div style="margin-top:18px; padding-top:16px; border-top:1px solid #334155; display:flex; gap:10px;">
-    <button type="button" class="btn" style="flex:1; border:1px solid #38bdf8; color:#38bdf8; font-size:12px; font-weight:700; padding:10px; background:rgba(56,189,248,0.1); border-radius:8px; cursor:pointer;" onclick="openPublicRequestModal()">
+  <div style="margin-top:18px; padding-top:16px; border-top:1px solid #e2e8f0; display:flex; gap:10px;">
+    <button type="button" class="btn" style="flex:1; border:1px solid #0284c7; color:#0284c7; font-size:12px; font-weight:700; padding:10px; background:#f0f9ff; border-radius:8px; cursor:pointer;" onclick="openPublicRequestModal()">
       📝 Request Statement
     </button>
-    <button type="button" class="btn" style="flex:1; border:1px solid #fbbf24; color:#fbbf24; font-size:12px; font-weight:700; padding:10px; background:rgba(251,191,36,0.1); border-radius:8px; cursor:pointer;" onclick="openTrackModal()">
+    <button type="button" class="btn" style="flex:1; border:1px solid #d97706; color:#d97706; font-size:12px; font-weight:700; padding:10px; background:#fffbeb; border-radius:8px; cursor:pointer;" onclick="openTrackModal()">
       🔍 Track Status
     </button>
   </div>
 
   <div class="footer-note">
     BRAC Institute of Educational Development (BRAC IED)<br>
-    <span style="font-weight:600; color:#38bdf8; font-size:11px; margin-top:4px; display:inline-block;">Developer: Wasik Ahmed Khan</span>
+    <span style="font-weight:600; color:#2563eb; font-size:11px; margin-top:4px; display:inline-block;">Developer: Wasik Ahmed Khan</span>
   </div>
 </div>
 
 <!-- Public Employee Request Modal -->
-<div class="modal-overlay" id="publicRequestModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:300; align-items:center; justify-content:center;">
-  <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; width:480px; max-width:90%; padding:24px; color:#e2e8f0; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:16px;">
-      <h3 style="color:#38bdf8; font-size:16px; margin:0; font-weight:700;">📝 Request Income Tax Statement</h3>
-      <button style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;" onclick="closePublicRequestModal()">&times;</button>
+<div class="modal-overlay" id="publicRequestModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:300; align-items:center; justify-content:center;">
+  <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; width:480px; max-width:90%; padding:24px; color:#0f172a; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+      <h3 style="color:#0284c7; font-size:16px; margin:0; font-weight:700;">📝 Request Income Tax Statement</h3>
+      <button style="background:none; border:none; color:#64748b; font-size:20px; cursor:pointer;" onclick="closePublicRequestModal()">&times;</button>
     </div>
     <form onsubmit="handlePublicRequestSubmit(event)">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
         <div>
-          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Main PIN Number *</label>
-          <input type="text" id="reqPin" placeholder="e.g. 10100" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Main PIN Number *</label>
+          <input type="text" id="reqPin" placeholder="e.g. 10100" required style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
         </div>
         <div>
-          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Full Name *</label>
-          <input type="text" id="reqName" placeholder="Enter Full Name" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Full Name *</label>
+          <input type="text" id="reqName" placeholder="Enter Full Name" required style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
         <div>
-          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Designation</label>
-          <input type="text" id="reqDesignation" placeholder="Designation" style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Designation</label>
+          <input type="text" id="reqDesignation" placeholder="Designation" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
         </div>
         <div>
-          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">TIN Number</label>
-          <input type="text" id="reqTin" placeholder="12-Digit TIN" style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+          <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">TIN Number</label>
+          <input type="text" id="reqTin" placeholder="12-Digit TIN" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
         </div>
       </div>
       <div style="margin-bottom:12px;">
-        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Notification Email Address *</label>
-        <input type="email" id="reqEmail" placeholder="your.name@brac.net" required style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Notification Email Address *</label>
+        <input type="email" id="reqEmail" placeholder="your.name@brac.net" required style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
       </div>
       <div style="margin-bottom:16px;">
-        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Fiscal Year</label>
-        <select id="reqFy" style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#38bdf8; font-weight:700; border-radius:6px; font-size:13px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Fiscal Year</label>
+        <select id="reqFy" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0284c7; font-weight:700; border-radius:6px; font-size:13px;">
           <option value="2025-2026">FY 2025-2026</option>
           <option value="2024-2025">FY 2024-2025</option>
         </select>
@@ -292,22 +314,22 @@ body {
 </div>
 
 <!-- Public Tracking Modal -->
-<div class="modal-overlay" id="trackModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:300; align-items:center; justify-content:center;">
-  <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; width:460px; max-width:90%; padding:24px; color:#e2e8f0; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:16px;">
-      <h3 style="color:#fbbf24; font-size:16px; margin:0; font-weight:700;">🔍 Track Request Progress</h3>
-      <button style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;" onclick="closeTrackModal()">&times;</button>
+<div class="modal-overlay" id="trackModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:300; align-items:center; justify-content:center;">
+  <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; width:460px; max-width:90%; padding:24px; color:#0f172a; box-shadow:0 20px 25px -5px rgba(0,0,0,0.15);">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+      <h3 style="color:#d97706; font-size:16px; margin:0; font-weight:700;">🔍 Track Request Progress</h3>
+      <button style="background:none; border:none; color:#64748b; font-size:20px; cursor:pointer;" onclick="closeTrackModal()">&times;</button>
     </div>
     <form onsubmit="handleTrackSubmit(event)">
       <div style="margin-bottom:12px;">
-        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">Enter PIN or Request ID</label>
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; display:block; margin-bottom:4px;">Enter PIN or Request ID</label>
         <div style="display:flex; gap:8px;">
-          <input type="text" id="trackQuery" placeholder="e.g. 10100 or REQ-2026..." required style="flex:1; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
-          <button type="submit" class="submit-btn" style="width:auto; padding:8px 16px; background:#f59e0b;">Search</button>
+          <input type="text" id="trackQuery" placeholder="e.g. 10100 or REQ-2026..." required style="flex:1; padding:8px 12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:6px; font-size:13px;">
+          <button type="submit" class="submit-btn" style="width:auto; padding:8px 16px; background:#d97706;">Search</button>
         </div>
       </div>
     </form>
-    <div id="trackResultContainer" style="margin-top:16px; display:none; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:14px;">
+    <div id="trackResultContainer" style="margin-top:16px; display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
     </div>
   </div>
 </div>
