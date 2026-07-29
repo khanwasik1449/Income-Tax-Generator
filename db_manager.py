@@ -123,13 +123,56 @@ def init_db():
         if cursor.fetchone()[0] == 0:
             sample_reqs = [
                 ("REQ-20260729-1001", "10100", "Wasik Ahmed Khan", "Software Engineer", "123456789012", "wasik.ahmed@brac.net", "2024-2025", "Pending", "Requesting certificate for bank loan verification"),
-                ("REQ-20260729-1002", "PENDING_PIN", "Jane Smith", "Assistant Director", "987654321098", "jane.smith@brac.net", "2024-2025", "In Progress", "Needs physical signed copy"),
+                ("REQ-20260729-1002", "10102", "Jane Smith", "Assistant Director", "987654321098", "jane.smith@brac.net", "2024-2025", "In Progress", "Needs physical signed copy"),
                 ("REQ-20260729-1003", "10101", "Md. Tanvir Hossain", "Senior Finance Officer", "456789012345", "tanvir.hossain@brac.net", "2024-2025", "Ready for Pickup", "Certificate prepared & signed")
             ]
             cursor.executemany("""
                 INSERT INTO tax_requests (req_id, pin, name, designation, tin, email, fiscal_year, status, remarks)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, sample_reqs)
+
+        # Seed initial sample employees & tax records if employees table is empty
+        cursor.execute("SELECT COUNT(*) FROM employees;")
+        if cursor.fetchone()[0] == 0:
+            sample_emps = [
+                ("10100", "2024-2025", 2024, 2025, "Wasik Ahmed Khan", "Software Engineer", "BRAC IED", "Male", "123456789012", '{"Jul": 80000, "Aug": 80000, "Sep": 80000, "Oct": 80000, "Nov": 80000, "Dec": 80000, "Jan": 85000, "Feb": 85000, "Mar": 85000, "Apr": 85000, "May": 85000, "Jun": 85000}', 160000.0, 0.0, 0.0, 1150000.0, 1150000.0),
+                ("10101", "2024-2025", 2024, 2025, "Md. Tanvir Hossain", "Senior Finance Officer", "BRAC IED", "Male", "456789012345", '{"Jul": 65000, "Aug": 65000, "Sep": 65000, "Oct": 65000, "Nov": 65000, "Dec": 65000, "Jan": 70000, "Feb": 70000, "Mar": 70000, "Apr": 70000, "May": 70000, "Jun": 70000}', 135000.0, 0.0, 0.0, 945000.0, 945000.0),
+                ("10102", "2024-2025", 2024, 2025, "Jane Smith", "Assistant Director", "BRAC IED", "Female", "987654321098", '{"Jul": 95000, "Aug": 95000, "Sep": 95000, "Oct": 95000, "Nov": 95000, "Dec": 95000, "Jan": 100000, "Feb": 100000, "Mar": 100000, "Apr": 100000, "May": 100000, "Jun": 100000}', 195000.0, 0.0, 0.0, 1365000.0, 1365000.0),
+                ("10103", "2024-2025", 2024, 2025, "Anisur Rahman", "Audit Supervisor", "BRAC IED", "Male", "345678901234", '{"Jul": 60000, "Aug": 60000, "Sep": 60000, "Oct": 60000, "Nov": 60000, "Dec": 60000, "Jan": 62000, "Feb": 62000, "Mar": 62000, "Apr": 62000, "May": 62000, "Jun": 62000}', 122000.0, 0.0, 0.0, 854000.0, 854000.0),
+                
+                ("10100", "2025-2026", 2025, 2026, "Wasik Ahmed Khan", "Software Engineer", "BRAC IED", "Male", "123456789012", '{"Jul": 90000, "Aug": 90000, "Sep": 90000, "Oct": 90000, "Nov": 90000, "Dec": 90000, "Jan": 95000, "Feb": 95000, "Mar": 95000, "Apr": 95000, "May": 95000, "Jun": 95000}', 185000.0, 0.0, 0.0, 1295000.0, 1295000.0),
+                ("10101", "2025-2026", 2025, 2026, "Md. Tanvir Hossain", "Senior Finance Officer", "BRAC IED", "Male", "456789012345", '{"Jul": 72000, "Aug": 72000, "Sep": 72000, "Oct": 72000, "Nov": 72000, "Dec": 72000, "Jan": 75000, "Feb": 75000, "Mar": 75000, "Apr": 75000, "May": 75000, "Jun": 75000}', 147000.0, 0.0, 0.0, 1029000.0, 1029000.0),
+                ("10102", "2025-2026", 2025, 2026, "Jane Smith", "Assistant Director", "BRAC IED", "Female", "987654321098", '{"Jul": 105000, "Aug": 105000, "Sep": 105000, "Oct": 105000, "Nov": 105000, "Dec": 105000, "Jan": 110000, "Feb": 110000, "Mar": 110000, "Apr": 110000, "May": 110000, "Jun": 110000}', 215000.0, 0.0, 0.0, 1505000.0, 1505000.0),
+                ("10103", "2025-2026", 2025, 2026, "Anisur Rahman", "Audit Supervisor", "BRAC IED", "Male", "345678901234", '{"Jul": 65000, "Aug": 65000, "Sep": 65000, "Oct": 65000, "Nov": 65000, "Dec": 65000, "Jan": 68000, "Feb": 68000, "Mar": 68000, "Apr": 68000, "May": 68000, "Jun": 68000}', 133000.0, 0.0, 0.0, 931000.0, 931000.0)
+            ]
+            cursor.executemany("""
+                INSERT INTO employees (
+                    pin, fiscal_year, start_year, end_year, name, designation, department,
+                    gender, tin, monthly_salary, festival_bonus, arrears, others, gross, net_total
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, sample_emps)
+
+            sample_tax = [
+                ("10100", "2024-2025", 2024, 2025, "Dec 2024", "CH-2024-101", "15/12/2024", 5000.0, 60000.0, "Sonali Bank, Dhaka"),
+                ("10101", "2024-2025", 2024, 2025, "Dec 2024", "CH-2024-102", "15/12/2024", 3500.0, 42000.0, "Sonali Bank, Dhaka"),
+                ("10102", "2024-2025", 2024, 2025, "Dec 2024", "CH-2024-103", "15/12/2024", 7500.0, 90000.0, "Sonali Bank, Dhaka"),
+                ("10100", "2025-2026", 2025, 2026, "Dec 2025", "CH-2025-101", "15/12/2025", 6000.0, 72000.0, "Sonali Bank, Dhaka"),
+                ("10101", "2025-2026", 2025, 2026, "Dec 2025", "CH-2025-102", "15/12/2025", 4200.0, 50400.0, "Sonali Bank, Dhaka"),
+                ("10102", "2025-2026", 2025, 2026, "Dec 2025", "CH-2025-103", "15/12/2025", 8200.0, 98400.0, "Sonali Bank, Dhaka")
+            ]
+            cursor.executemany("""
+                INSERT INTO tax_records (
+                    pin, fiscal_year, start_year, end_year, month, challan_no, challan_date, claim_amount, total_challan_amount, bank_info
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, sample_tax)
+
+            cursor.execute("""
+                INSERT OR IGNORE INTO dataset_batches (batch_id, fiscal_year, dataset_type, filename, record_count, file_size_bytes, uploaded_by)
+                VALUES ('SAMPLE-DB-2425', '2024-2025', 'database', 'sample_database_2024_2025.csv', 4, 1024, 'system'),
+                       ('SAMPLE-DB-2526', '2025-2026', 'database', 'sample_database_2025_2026.csv', 4, 1024, 'system'),
+                       ('SAMPLE-TX-2425', '2024-2025', 'tax', 'sample_tax_2024_2025.csv', 3, 512, 'system'),
+                       ('SAMPLE-TX-2526', '2025-2026', 'tax', 'sample_tax_2025_2026.csv', 3, 512, 'system')
+            """)
 
         conn.commit()
 
