@@ -720,12 +720,12 @@ tr:hover td { background: #f8fafc; }
   </div>
 </div>
 
-<!-- HR Prepare & Assign PIN Popup Modal -->
+<!-- HR Prepare Statement Modal: Assign Dummy PIN against Main PIN -->
 <div class="modal-overlay" id="preparePinModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); z-index:300; align-items:center; justify-content:center;">
   <div style="background:#0f172a; border:1px solid #334155; border-radius:14px; width:520px; max-width:92%; padding:24px; color:#e2e8f0; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:16px;">
       <div>
-        <h3 style="color:#38bdf8; font-size:16px; margin:0; font-weight:700;">📄 Prepare Statement &amp; Assign PIN</h3>
+        <h3 style="color:#38bdf8; font-size:16px; margin:0; font-weight:700;">📄 Prepare Statement - Assign Dummy PIN</h3>
         <div style="font-size:12px; color:#fbbf24; font-weight:600; margin-top:2px;" id="prepModalEmpInfo">Employee: Wasik Ahmed Khan</div>
       </div>
       <button style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;" onclick="closePreparePinModal()">&times;</button>
@@ -735,23 +735,29 @@ tr:hover td { background: #f8fafc; }
       <input type="hidden" id="prepReqId">
       <input type="hidden" id="prepFiscalYear">
       
-      <div style="margin-bottom:14px;">
-        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:6px;">Main PIN or Dummy PIN *</label>
-        <input type="text" id="prepPinInput" oninput="searchDirectoryPinsForMatch()" placeholder="Type PIN (e.g. 10100) or Dummy PIN (e.g. DP-9001)..." required style="width:100%; padding:10px 14px; border:2px solid #38bdf8; background:#1e293b; color:#fff; border-radius:8px; font-size:14px; font-weight:800;">
-        <div style="font-size:10px; color:#64748b; margin-top:4px;">Type a PIN to find existing directory records or enter a custom Dummy PIN.</div>
+      <!-- Select Main PIN from Directory -->
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94a3b8; display:block; margin-bottom:4px;">1. Find Main Employee PIN in Directory</label>
+        <input type="text" id="prepMainPinInput" oninput="searchDirectoryPinsForMatch()" placeholder="Search Directory by Main PIN or Name..." style="width:100%; padding:8px 12px; border:1px solid #334155; background:#1e293b; color:#fff; border-radius:6px; font-size:13px;">
       </div>
 
-      <!-- Live Directory Matches Container -->
-      <div style="margin-bottom:16px;">
-        <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#38bdf8; margin-bottom:6px;">🔍 Matching Directory Employees:</div>
-        <div id="prepDirectoryMatchList" style="max-height:160px; overflow-y:auto; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:6px;">
-          <div style="text-align:center; padding:10px; font-size:11px; color:#64748b;">Type a PIN or name to search directory...</div>
+      <!-- Live Directory Matches List -->
+      <div style="margin-bottom:14px;">
+        <div id="prepDirectoryMatchList" style="max-height:120px; overflow-y:auto; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:6px;">
+          <div style="text-align:center; padding:8px; font-size:11px; color:#64748b;">Type a PIN or name to search directory...</div>
         </div>
       </div>
 
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; border-top:1px solid #334155; padding-top:14px;">
+      <!-- Input Dummy PIN -->
+      <div style="margin-bottom:16px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:12px;">
+        <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#fbbf24; display:block; margin-bottom:6px;">2. Assign Dummy PIN for Statement *</label>
+        <input type="text" id="prepPinInput" placeholder="Enter Dummy PIN (e.g. DP-9001 or 10100)..." required style="width:100%; padding:10px 14px; border:2px solid #38bdf8; background:#0f172a; color:#fff; border-radius:8px; font-size:14px; font-weight:800;">
+        <div style="font-size:10px; color:#94a3b8; margin-top:4px;">This Dummy PIN will be assigned against the Main PIN to prepare and print the tax certificate.</div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #334155; padding-top:14px;">
         <button type="button" class="btn btn-outline" style="border-color:#475569; color:#cbd5e1;" onclick="closePreparePinModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary" style="background:#2563eb; font-weight:700;">📄 Save PIN &amp; Preview Statement</button>
+        <button type="submit" class="btn btn-primary" style="background:#2563eb; font-weight:700;">📄 Save Dummy PIN &amp; Generate PDF</button>
       </div>
     </form>
   </div>
@@ -1616,9 +1622,12 @@ function openPreparePinModal(reqId, empName, currentPin, fiscalYear) {
   document.getElementById('prepFiscalYear').value = fiscalYear;
   document.getElementById('prepModalEmpInfo').textContent = 'Employee: ' + empName + ' (FY ' + fiscalYear + ')';
   
-  const pinInput = document.getElementById('prepPinInput');
+  const mainPinInput = document.getElementById('prepMainPinInput');
+  const dummyPinInput = document.getElementById('prepPinInput');
+  
   const val = (currentPin === 'PENDING_PIN' || !currentPin) ? '' : currentPin;
-  pinInput.value = val;
+  mainPinInput.value = '';
+  dummyPinInput.value = val;
   
   document.getElementById('preparePinModal').style.display = 'flex';
   searchDirectoryPinsForMatch();
@@ -1629,16 +1638,19 @@ function closePreparePinModal() {
   currentPrepRequest = null;
 }
 
-function selectPrepMatchPin(pin) {
-  document.getElementById('prepPinInput').value = pin;
-  searchDirectoryPinsForMatch();
+function selectPrepMatchPin(pin, name) {
+  document.getElementById('prepMainPinInput').value = pin + ' - ' + name;
+  const dummyInput = document.getElementById('prepPinInput');
+  if (!dummyInput.value || dummyInput.value === 'PENDING_PIN') {
+    dummyInput.value = 'DP-' + pin;
+  }
 }
 
 function searchDirectoryPinsForMatch() {
   const container = document.getElementById('prepDirectoryMatchList');
   if (!container) return;
 
-  const q = (document.getElementById('prepPinInput').value || '').toLowerCase().trim();
+  const q = (document.getElementById('prepMainPinInput').value || '').toLowerCase().trim();
   const empNameQuery = (currentPrepRequest ? currentPrepRequest.empName : '').toLowerCase().trim();
 
   // Search in global employees array loaded in memory
@@ -1652,15 +1664,16 @@ function searchDirectoryPinsForMatch() {
   }
 
   if (!matches.length) {
-    container.innerHTML = '<div style="text-align:center; padding:10px; font-size:11px; color:#64748b;">No directory employee matches found for "' + (q || empNameQuery) + '". You can assign a custom Dummy PIN (e.g. DP-9001).</div>';
+    container.innerHTML = '<div style="text-align:center; padding:8px; font-size:11px; color:#64748b;">No directory employee matches found for "' + (q || empNameQuery) + '". You can type any custom Dummy PIN below.</div>';
     return;
   }
 
   let html = '';
-  matches.slice(0, 8).forEach(e => {
-    html += '<div onclick="selectPrepMatchPin(\'' + e.pin + '\')" style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid #334155; cursor:pointer; background:#0f172a; border-radius:6px; margin-bottom:4px;" title="Click to select this PIN">';
-    html += '<div><strong style="color:#fbbf24; font-size:12px;">PIN: ' + e.pin + '</strong> <span style="color:#fff; font-size:12px; margin-left:6px;">' + (e.name || '') + '</span></div>';
-    html += '<span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.1); padding:2px 6px; border-radius:4px;">' + (e.department || 'Select') + '</span>';
+  matches.slice(0, 6).forEach(e => {
+    const safeName = (e.name || '').replace(/'/g, "\\'");
+    html += '<div onclick="selectPrepMatchPin(\'' + e.pin + '\', \'' + safeName + '\')" style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid #334155; cursor:pointer; background:#0f172a; border-radius:6px; margin-bottom:4px;" title="Click to select Main PIN">';
+    html += '<div><strong style="color:#fbbf24; font-size:12px;">Main PIN: ' + e.pin + '</strong> <span style="color:#fff; font-size:12px; margin-left:6px;">' + (e.name || '') + '</span></div>';
+    html += '<span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.1); padding:2px 6px; border-radius:4px;">Select PIN</span>';
     html += '</div>';
   });
   container.innerHTML = html;
