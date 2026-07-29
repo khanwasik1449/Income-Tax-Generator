@@ -748,12 +748,12 @@ tr:hover td { background: #f8fafc; }
       <div style="margin-bottom:18px;">
         <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#fbbf24; display:block; margin-bottom:6px;">Assign Dummy PIN against Main PIN *</label>
         <input type="text" id="prepPinInput" placeholder="Enter Dummy PIN (e.g. DP-9001 or 10100)..." required style="width:100%; padding:10px 14px; border:2px solid #38bdf8; background:#1e293b; color:#fff; border-radius:8px; font-size:14px; font-weight:800;">
-        <div style="font-size:11px; color:#64748b; margin-top:6px;">Enter the Dummy PIN that will be printed on statement against Main PIN <span id="prepModalMainPinSub" style="color:#fbbf24; font-weight:700;">10100</span>.</div>
+        <div style="font-size:11px; color:#64748b; margin-top:6px;">Enter the Dummy PIN to generate statement for Main PIN <span id="prepModalMainPinSub" style="color:#fbbf24; font-weight:700;">10100</span> (Not saved in DB).</div>
       </div>
 
       <div style="display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #334155; padding-top:14px;">
         <button type="button" class="btn btn-outline" style="border-color:#475569; color:#cbd5e1;" onclick="closePreparePinModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary" style="background:#2563eb; font-weight:700;">📄 Save Dummy PIN &amp; Generate PDF</button>
+        <button type="submit" class="btn btn-primary" style="background:#2563eb; font-weight:700;">📄 Generate &amp; Preview PDF Statement</button>
       </div>
     </form>
   </div>
@@ -1638,26 +1638,17 @@ async function handlePreparePinSubmit(e) {
   e.preventDefault();
   const reqId = document.getElementById('prepReqId').value;
   const fiscalYear = document.getElementById('prepFiscalYear').value;
-  const assignedPin = document.getElementById('prepPinInput').value.trim();
+  const dummyPin = document.getElementById('prepPinInput').value.trim();
 
-  if (!assignedPin) {
-    showToast('Please enter or select a valid PIN or Dummy PIN');
+  if (!dummyPin) {
+    showToast('Please enter a Dummy PIN');
     return;
   }
 
-  showToast('Assigning PIN ' + assignedPin + ' & opening PDF preview...');
+  showToast('Opening PDF preview with Dummy PIN ' + dummyPin + '...');
 
   try {
-    // 1. Assign PIN
-    const resp = await fetch('/api/request/' + encodeURIComponent(reqId) + '/pin', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin: assignedPin })
-    });
-    const data = await resp.json();
-    if (data.error) { showToast('Error: ' + data.error); return; }
-
-    // 2. Update Status to In Progress
+    // 1. Update Status to In Progress (WITHOUT writing dummy PIN to DB)
     await fetch('/api/request/' + encodeURIComponent(reqId) + '/status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1667,11 +1658,11 @@ async function handlePreparePinSubmit(e) {
     closePreparePinModal();
     loadRequestsData();
 
-    // 3. Switch Fiscal Year if needed & Open PDF Live Preview Modal
+    // 2. Switch Fiscal Year if needed & Open PDF Live Preview Modal with transient Dummy PIN
     if (fiscalYear && selectedFiscalYear !== fiscalYear) {
       changeFiscalYear(fiscalYear);
     }
-    openPdfPreview(assignedPin);
+    openPdfPreview(dummyPin);
   } catch (err) {
     showToast('Failed to prepare statement: ' + err.message);
   }
